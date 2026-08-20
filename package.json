@@ -1,0 +1,66 @@
+{
+  "name": "golden-vector-provenance",
+  "version": "0.2.0",
+  "description": "Reproducible provenance for computed answers: a canonical SHA-256 fixed point (RFC 8785 JCS) that anyone can re-derive for free, so you recompute the answer instead of trusting the server.",
+  "keywords": [
+    "provenance",
+    "reproducible",
+    "canonicalization",
+    "rfc8785",
+    "jcs",
+    "ed25519",
+    "attestation",
+    "receipt",
+    "verifiable",
+    "x402",
+    "agents"
+  ],
+  "type": "module",
+  "main": "./index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./gvp": "./ref/js/gvp.mjs",
+    "./attest": "./ref/js/attest.mjs",
+    "./schema/receipt": "./schema/receipt.schema.json",
+    "./schema/revocation-list": "./schema/revocation-list.schema.json",
+    "./vectors": "./vectors/expected.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.mjs",
+    "ref/js/",
+    "ref/py/gvp.py",
+    "ref/py/attest.py",
+    "spec/",
+    "schema/",
+    "vectors/",
+    "tools/",
+    "README.md",
+    "LICENSE",
+    "LICENSE-APACHE-2.0",
+    "LICENSE-CC-BY-4.0"
+  ],
+  "scripts": {
+    "test": "npm run check:l1l2 && npm run check:jcs",
+    "check:l1l2": "node tools/check-js.mjs",
+    "check:jcs": "node tools/check-jcs.mjs",
+    "vectors": "node tools/gen-vectors.mjs",
+    "attestation": "node tools/gen-attestation.mjs"
+  },
+  "devDependencies": {
+    "canonicalize": "^2.1.0"
+  },
+  "license": "Apache-2.0 AND CC-BY-4.0",
+  "author": "Solomon Dzukey",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SolomonisBlack/golden-vector-provenance.git"
+  },
+  "homepage": "https://github.com/SolomonisBlack/golden-vector-provenance#readme",
+  "bugs": {
+    "url": "https://github.com/SolomonisBlack/golden-vector-provenance/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

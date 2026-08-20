@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gvp.example/schema/revocation-list-0.2.json",
+  "title": "GVP Revocation List",
+  "description": "A signed, append-only list of revoked receipt hashes — the GVP errata path (spec §7). Since a reproducible answer stays reproducibly wrong once issued, this is the only sanctioned way to walk one back.",
+  "type": "object",
+  "required": ["revocationListVersion", "issuer", "updatedAt", "revoked"],
+  "additionalProperties": true,
+  "properties": {
+    "revocationListVersion": { "const": "GVP-Revocation/0.2" },
+    "issuer": { "type": "string", "description": "issuer service identifier (matches the receipt's issuer.service)" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "revoked": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["responseHash", "reason", "revokedAt"],
+        "properties": {
+          "responseHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+          "reason": { "type": "string" },
+          "revokedAt": { "type": "string", "format": "date-time" },
+          "supersededBy": {
+            "oneOf": [
+              { "type": "null" },
+              { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "description": "the responseHash of the corrected answer, if any" }
+            ]
+          }
+        }
+      }
+    },
+    "signature": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["alg", "publicKey", "signature"],
+          "properties": {
+            "alg": { "const": "Ed25519" },
+            "publicKey": { "type": "string" },
+            "signature": { "type": "string" },
+            "keyId": { "type": "string" }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "name": "se-tax-realistic",
+    "fixedPoint": {
+      "endpoint": "/v1/self-employment-tax",
+      "inputs": { "netProfit": 80000, "filingStatus": "single", "w2SocialSecurityWages": 0 },
+      "result": { "netEarningsFromSelfEmployment": 73880, "socialSecurityPortion": 9161.12, "medicarePortion": 2142.52, "additionalMedicare": 0, "selfEmploymentTax": 11303.64, "deductibleHalf": 5651.82 },
+      "method": "Schedule SE: net earnings = profit x 0.9235; SS 12.4% to wage base; Medicare 2.9%",
+      "dataVintage": "2026.0"
+    }
+  },
+  {
+    "name": "paycheck-state-string",
+    "fixedPoint": {
+      "endpoint": "/v1/paycheck",
+      "inputs": { "salary": 150000, "state": "CA", "filingStatus": "single", "payFrequency": "biweekly" },
+      "result": { "stateName": "California", "federalTax": 24734, "stateTax": 10388.64, "netAnnual": 103402.36 },
+      "method": "2026 brackets; state marginal ladder applied to gross",
+      "dataVintage": "2026.0"
+    }
+  },
+  {
+    "name": "integral-floats-and-negatives",
+    "fixedPoint": { "endpoint": "/v1/edge", "inputs": {}, "result": { "a": 0, "b": 1500, "c": 1500.0, "d": 92350.0, "e": -12.3, "f": 0.05525, "g": true, "h": false, "i": null }, "method": "edge numbers", "dataVintage": "2026.0" }
+  },
+  {
+    "name": "non-ascii-utf8-raw",
+    "fixedPoint": { "endpoint": "/v1/unicode", "inputs": { "note": "café — 50% × rate, naïve" }, "result": { "label": "Björk €12,50 — 日本語" }, "method": "unicode passthrough", "dataVintage": "2026.0" }
+  },
+  {
+    "name": "control-char-escaping",
+    "fixedPoint": { "endpoint": "/v1/escape", "inputs": { "s": "tab\there\nnewline \"quote\" back\\slash" }, "result": {}, "method": "escape rules", "dataVintage": "2026.0" }
+  },
+  {
+    "name": "nested-arrays-of-objects",
+    "fixedPoint": {
+      "endpoint": "/v1/reports/relocation-paycheck",
+      "inputs": { "salary": 85000 },
+      "result": { "jurisdictions": 3, "ranked": [ { "rank": 1, "state": "TX", "netAnnual": 68627.5 }, { "rank": 2, "state": "FL", "netAnnual": 68627.5 }, { "rank": 3, "state": "CA", "netAnnual": 60123.1 } ] },
+      "method": "rank by net annual",
+      "dataVintage": "2026.0"
+    }
+  },
+  {
+    "name": "empty-containers-and-key-order",
+    "fixedPoint": { "endpoint": "/v1/empty", "zzz": 1, "aaa": 2, "inputs": { "obj": {}, "arr": [] }, "result": {}, "method": "m", "dataVintage": "2026.0" }
+  },
+  {
+    "name": "ecma-number-edge-cases",
+    "fixedPoint": { "endpoint": "/v1/ecma", "inputs": {}, "result": { "tiny": 0.00001, "micro": 0.000001, "e7": 1e-7, "big15": 1000000000000000, "big15b": 1500000000000000, "e16": 1e16, "e21": 1e21, "frac": 0.30000000000000004, "neg": -12.3, "sub": 5e-324, "whole": 200000.0 }, "method": "ecma number formatting", "dataVintage": "2026.0" }
+  }
+]

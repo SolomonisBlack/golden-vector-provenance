@@ -1,0 +1,8 @@
+# Python bytecode
+__pycache__/
+*.pyc
+# Node
+node_modules/
+package-lock.json
+# uv ephemeral envs
+.venv/

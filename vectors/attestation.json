@@ -1,0 +1,134 @@
+{
+  "alg": "Ed25519",
+  "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+  "vectors": [
+    {
+      "name": "se-tax-realistic",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-07-19T00:00:00.000Z"
+      },
+      "canonicalPayload": "{\"agentId\":\"59110\",\"dataVintage\":\"2026.0\",\"endpoint\":\"/v1/self-employment-tax\",\"issuedAt\":\"2026-07-19T00:00:00.000Z\",\"issuer\":\"gvp.example\",\"responseHash\":\"sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771\"}",
+      "expected": {
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "M7EA2qI0QzK8u+F7THgCEJ0SSNe/D9hjhQ0DV6uaj2uO9P5OXJWtvmGtbBkulRWFV5b4hlu+v5p8evz/SxcTBw=="
+      }
+    },
+    {
+      "name": "paycheck-state-string",
+      "payload": {
+        "responseHash": "sha256:5e46f391c0a085456dda884f5499bd1c7da07b47e6cf915d37ddd2ee677d62b5",
+        "endpoint": "/v1/paycheck",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-07-19T00:00:00.000Z"
+      },
+      "canonicalPayload": "{\"agentId\":\"59110\",\"dataVintage\":\"2026.0\",\"endpoint\":\"/v1/paycheck\",\"issuedAt\":\"2026-07-19T00:00:00.000Z\",\"issuer\":\"gvp.example\",\"responseHash\":\"sha256:5e46f391c0a085456dda884f5499bd1c7da07b47e6cf915d37ddd2ee677d62b5\"}",
+      "expected": {
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "eOvFY5r/XgfBTGZRY3PTSuiXfROZglf/c+iy5c0IBUWmxlY8WrjwogVnprzZsiBQ+uwGeH3lIUdXFpc6DnxHDA=="
+      }
+    },
+    {
+      "name": "integral-floats-and-negatives",
+      "payload": {
+        "responseHash": "sha256:1750490594dfed04fd260e2f40032d432abec31fd984de7328e5aeeaabe8c335",
+        "endpoint": "/v1/edge",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-07-19T00:00:00.000Z"
+      },
+      "canonicalPayload": "{\"agentId\":\"59110\",\"dataVintage\":\"2026.0\",\"endpoint\":\"/v1/edge\",\"issuedAt\":\"2026-07-19T00:00:00.000Z\",\"issuer\":\"gvp.example\",\"responseHash\":\"sha256:1750490594dfed04fd260e2f40032d432abec31fd984de7328e5aeeaabe8c335\"}",
+      "expected": {
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "Z5aVzQLgHnQR0wj0jRwNrOsecQ/dO+7+myOL5vCYkQanKiOK5c5AuxirNE9S3FNQpO+oBt9y3Ei0XP29fqonBQ=="
+      }
+    },
+    {
+      "name": "non-ascii-utf8-raw",
+      "payload": {
+        "responseHash": "sha256:39831d81ff4f5cd588d1c80d56189d8355ffb30d0558cbcce6d42e8e22ca8fe6",
+        "endpoint": "/v1/unicode",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-07-19T00:00:00.000Z"
+      },
+      "canonicalPayload": "{\"agentId\":\"59110\",\"dataVintage\":\"2026.0\",\"endpoint\":\"/v1/unicode\",\"issuedAt\":\"2026-07-19T00:00:00.000Z\",\"issuer\":\"gvp.example\",\"responseHash\":\"sha256:39831d81ff4f5cd588d1c80d56189d8355ffb30d0558cbcce6d42e8e22ca8fe6\"}",
+      "expected": {
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "zORyPcvIDauwVeQBghkJNCMzA1rbaHHlOQ92jbuXzTOJTzzJP+ggGpSLH5/RGelO99lIGV7cQ3QhJ2vDq/z2Ag=="
+      }
+    },
+    {
+      "name": "control-char-escaping",
+      "payload": {
+        "responseHash": "sha256:e8d1da5f2992ca790dcddfb1583cbb45c8411a82574c0ffc1de1191b8bffea02",
+        "endpoint": "/v1/escape",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-07-19T00:00:00.000Z"
+      },
+      "canonicalPayload": "{\"agentId\":\"59110\",\"dataVintage\":\"2026.0\",\"endpoint\":\"/v1/escape\",\"issuedAt\":\"2026-07-19T00:00:00.000Z\",\"issuer\":\"gvp.example\",\"responseHash\":\"sha256:e8d1da5f2992ca790dcddfb1583cbb45c8411a82574c0ffc1de1191b8bffea02\"}",
+      "expected": {
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "BqrulczVigWCg1FLqYBFK9ZKHtHebhEFYUPY2MRu/4B3NgSgk5ik8R47FRDIvlBpmhwFUeYAtQjAXjKK7paiAw=="
+      }
+    },
+    {
+      "name": "nested-arrays-of-objects",
+      "payload": {
+        "responseHash": "sha256:762f0e8c418542cc50fade035e0ca8a1c859ca9f17f7f4abbaac829c6e97dfb2",
+        "endpoint": "/v1/reports/relocation-paycheck",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-07-19T00:00:00.000Z"
+      },
+      "canonicalPayload": "{\"agentId\":\"59110\",\"dataVintage\":\"2026.0\",\"endpoint\":\"/v1/reports/relocation-paycheck\",\"issuedAt\":\"2026-07-19T00:00:00.000Z\",\"issuer\":\"gvp.example\",\"responseHash\":\"sha256:762f0e8c418542cc50fade035e0ca8a1c859ca9f17f7f4abbaac829c6e97dfb2\"}",
+      "expected": {
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "70a8v/kH0LdexLSUQ2POZ0df0kVgifiYq4Fx9sMkKj9fWbdd9mr8E0wgQ+yQQuoVGQxEgMcVikt5DOmK5Xt7DQ=="
+      }
+    },
+    {
+      "name": "empty-containers-and-key-order",
+      "payload": {
+        "responseHash": "sha256:98b6a3467b4b5ce949fb361258261e316a3fa7d4d68c52f22b4aaec4f711a410",
+        "endpoint": "/v1/empty",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-07-19T00:00:00.000Z"
+      },
+      "canonicalPayload": "{\"agentId\":\"59110\",\"dataVintage\":\"2026.0\",\"endpoint\":\"/v1/empty\",\"issuedAt\":\"2026-07-19T00:00:00.000Z\",\"issuer\":\"gvp.example\",\"responseHash\":\"sha256:98b6a3467b4b5ce949fb361258261e316a3fa7d4d68c52f22b4aaec4f711a410\"}",
+      "expected": {
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "5M5cB8KvMpfoyczHyP4/OZj+mNWqjigIhrG7V1RSayxB4PlfI09pnC/LNFnmXZIpfPRIq+8nxXzpJ1LwJmQ1Dg=="
+      }
+    },
+    {
+      "name": "ecma-number-edge-cases",
+      "payload": {
+        "responseHash": "sha256:507c0f5fd558518ff1724d519478db210bea67476b0161221448fa829d906f43",
+        "endpoint": "/v1/ecma",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-07-19T00:00:00.000Z"
+      },
+      "canonicalPayload": "{\"agentId\":\"59110\",\"dataVintage\":\"2026.0\",\"endpoint\":\"/v1/ecma\",\"issuedAt\":\"2026-07-19T00:00:00.000Z\",\"issuer\":\"gvp.example\",\"responseHash\":\"sha256:507c0f5fd558518ff1724d519478db210bea67476b0161221448fa829d906f43\"}",
+      "expected": {
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "8RMLN7A61mGAITXUkKWcnNbG8txJytJgNMsyuuNURPlRyK/nVxhZjEVl9Eo2zVIas7+Z/gy1492Rwx6wXNZPDQ=="
+      }
+    }
+  ]
+}

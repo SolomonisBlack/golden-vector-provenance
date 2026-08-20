@@ -1,0 +1,4 @@
+{
+  "privateKeyPkcs8B64": "MC4CAQAwBQYDK2VwBCIEIEuiK3zj8x6R0zvpAz7XWce5SjOx/hyw6ZLL/asxP5I+",
+  "note": "FIXED throwaway test key for GVP attestation conformance vectors — NOT a production key."
+}
