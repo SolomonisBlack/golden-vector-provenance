@@ -39,6 +39,36 @@ const responseHash = gvpHash({
 That is the whole of L1. If you already emit a signed receipt (x402, ACTA, or your own), adding
 `responseHash` to it upgrades "you paid for this URL" into "and here is proof of what came back."
 
+## Drop-in middleware (Express / Hono)
+
+If you'd rather not hash by hand, the `middleware` export attaches `responseHash` to every JSON
+response under the standard `extensions["response-provenance"]` envelope. You supply
+`buildFixedPoint`, which returns the subset of the exchange that identifies the answer.
+
+```js
+import express from 'express';
+import { expressProvenance } from 'golden-vector-provenance/middleware';
+
+const app = express();
+app.use(expressProvenance((req, body) => ({
+  endpoint:    req.path,
+  inputs:      req.query,
+  result:      body.result,
+  method:      body.method,
+  dataVintage: body.dataVintage,
+})));
+// now res.json({...}) also carries extensions["response-provenance"].responseHash
+```
+
+```js
+import { honoProvenance } from 'golden-vector-provenance/middleware';
+app.use(honoProvenance((c, body) => ({ /* same shape */ })));
+```
+
+Provenance never breaks serving: if `buildFixedPoint` returns falsy or throws, the response is emitted
+unchanged (Express records the error on `res.locals.gvpError`). The emitted block also lists which
+fields were hashed (`fixedPoint`), so a server can't silently omit one.
+
 ## What GVP proves — and what it doesn't
 
 | Claim | GVP | How |

@@ -1,6 +1,6 @@
 {
   "name": "golden-vector-provenance",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Reproducible provenance for computed answers: a canonical SHA-256 fixed point (RFC 8785 JCS) that anyone can re-derive for free, so you recompute the answer instead of trusting the server.",
   "keywords": [
     "provenance",
@@ -13,7 +13,10 @@
     "receipt",
     "verifiable",
     "x402",
-    "agents"
+    "agents",
+    "middleware",
+    "express",
+    "hono"
   ],
   "type": "module",
   "main": "./index.mjs",
@@ -24,7 +27,8 @@
     "./schema/receipt": "./schema/receipt.schema.json",
     "./schema/revocation-list": "./schema/revocation-list.schema.json",
     "./vectors": "./vectors/expected.json",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./middleware": "./middleware/index.mjs"
   },
   "files": [
     "index.mjs",
@@ -38,14 +42,16 @@
     "README.md",
     "LICENSE",
     "LICENSE-APACHE-2.0",
-    "LICENSE-CC-BY-4.0"
+    "LICENSE-CC-BY-4.0",
+    "middleware/index.mjs"
   ],
   "scripts": {
-    "test": "npm run check:l1l2 && npm run check:jcs",
+    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node middleware/test.mjs",
     "check:l1l2": "node tools/check-js.mjs",
     "check:jcs": "node tools/check-jcs.mjs",
     "vectors": "node tools/gen-vectors.mjs",
-    "attestation": "node tools/gen-attestation.mjs"
+    "attestation": "node tools/gen-attestation.mjs",
+    "check:mw": "node middleware/test.mjs"
   },
   "devDependencies": {
     "canonicalize": "^2.1.0"
