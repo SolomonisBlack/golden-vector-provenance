@@ -31,6 +31,25 @@ point (timestamps belong in the attestation, §6). `dataVintage` is the **only**
 variation: the same fixed point MUST always produce the same hash, forever, modulo a declared
 `dataVintage`.
 
+**All five members are REQUIRED and the set is closed.** An implementation MUST NOT emit a
+`responseHash` over a subset (e.g. omitting `inputs`) or a superset of these members. Two consequences
+are deliberate:
+
+- **The fixed point is fixed, not self-declared.** Where an emitted artifact lists which fields were
+  hashed (e.g. the `fixedPoint` array in the x402 `response-provenance` extension), that list is the
+  spec constant `["endpoint","inputs","result","method","dataVintage"]`, never a description supplied by
+  the issuer. On a bare response with no signed receipt, a self-declared list would be unbound: an issuer
+  could drop `inputs` from both the hash and the list and the artifact would remain internally
+  consistent. Pinning the member set closes that — a verifier always recomputes over the five spec
+  members, so any omission changes the hash and is detected.
+- **The hash binds the question, not only the answer.** Because `endpoint` and `inputs` are required,
+  `responseHash` attests "this `result` answered *this request*", not merely "this `result` is
+  unaltered". An artifact that bound only the answer would let an issuer re-attach a valid hash to a
+  different request.
+
+A verifier MUST reject an artifact whose fixed point is missing any member or carries an extra one, and
+MUST recompute the hash over exactly these five members rather than over whatever an issuer declares.
+
 ### 2.2 Canonical JSON (byte-level; this is the interop boundary)
 Two implementations interoperate only if they produce **identical bytes** before hashing.
 

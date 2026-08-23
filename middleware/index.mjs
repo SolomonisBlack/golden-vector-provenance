@@ -2,20 +2,49 @@
 // payload is bound, not just the payment. Framework-agnostic core + thin Express/Hono adapters.
 //
 // The hash is computed exactly as the spec requires: gvpHash over the RFC 8785 (JCS) canonical form of
-// a *declared* fixed point. You provide `buildFixedPoint`, which returns the subset of the exchange
-// that deterministically identifies the answer — for a calculator, typically
-// { endpoint, inputs, result, method, dataVintage }.
+// the fixed point { endpoint, inputs, result, method, dataVintage } (spec §2.1). You provide
+// `buildFixedPoint`, which returns that object for the current exchange.
+//
+// Two structural guarantees (from review on x402-foundation/x402#3234):
+//  1. The fixed point is FIXED, not self-declared. A seller cannot shrink it: all five members are
+//     required, and the emitted `fixedPoint` list is the spec's constant, not Object.keys() of whatever
+//     was passed. On a bare 200 (no signed receipt) a self-declared list would be unbound — a seller
+//     could drop `inputs` from both the hash and the list and still look internally consistent. Pinning
+//     the member set closes that; a checker that recomputes over the five spec fields catches any
+//     omission because the hash won't match.
+//  2. The hash binds the QUESTION as well as the answer: `endpoint` and `inputs` are required members,
+//     so `responseHash` attests "this body answered this request", not merely "this body is unaltered".
 import { gvpHash } from '../ref/js/gvp.mjs';
 
 export const EXTENSION_KEY = 'response-provenance';
 export const SPEC_URL = 'https://github.com/SolomonisBlack/golden-vector-provenance';
+// The spec's fixed-point members, in canonical order. Constant by design — see guarantee 1 above.
+export const FIXED_POINT_FIELDS = Object.freeze(['endpoint', 'inputs', 'result', 'method', 'dataVintage']);
 
-// Core: given a fixed point, return the extension block to merge into a response body.
+// Validate a candidate fixed point against spec §2.1: exactly these members, no extras, no missing.
+// Throws with a precise message so a misconfigured buildFixedPoint fails loudly in development.
+export function assertFixedPoint(fp) {
+  if (fp === null || typeof fp !== 'object' || Array.isArray(fp)) {
+    throw new TypeError('fixed point must be a JSON object');
+  }
+  const keys = Object.keys(fp);
+  const missing = FIXED_POINT_FIELDS.filter(k => !(k in fp));
+  if (missing.length) throw new TypeError(`fixed point missing required member(s): ${missing.join(', ')}`);
+  const extra = keys.filter(k => !FIXED_POINT_FIELDS.includes(k));
+  if (extra.length) throw new TypeError(`fixed point has non-spec member(s): ${extra.join(', ')} (spec §2.1: no other member participates)`);
+  if (typeof fp.endpoint !== 'string') throw new TypeError('fixed point: endpoint must be a string');
+  if (typeof fp.method !== 'string') throw new TypeError('fixed point: method must be a string');
+  if (typeof fp.dataVintage !== 'string') throw new TypeError('fixed point: dataVintage must be a string');
+  return fp;
+}
+
+// Core: given a (validated) fixed point, return the extension block to merge into a response body.
 // Proves re-derivability, NOT correctness (a consumer recomputes the fixed point and re-hashes).
 export function provenanceBlock(fixedPoint) {
+  assertFixedPoint(fixedPoint);
   return {
     responseHash: gvpHash(fixedPoint),
-    fixedPoint: Object.keys(fixedPoint),   // which fields were hashed — a server can't silently omit one
+    fixedPoint: [...FIXED_POINT_FIELDS],   // the spec constant — declaration cannot drift from the hash
     spec: SPEC_URL,
   };
 }

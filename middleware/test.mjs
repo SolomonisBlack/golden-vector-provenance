@@ -101,6 +101,33 @@ throws('honoProvenance requires a function', () => honoProvenance(123));
   eq('hono body intact after cl drop', parsed.extensions[EXTENSION_KEY].responseHash, EXPECTED);
 }
 
+// 4b. Structural integrity (review on x402-foundation/x402#3234): the fixed point is FIXED, not
+//     self-declared. The attack: drop `inputs` from both the hash AND the declared list so a bare-200
+//     artifact stays internally consistent and a checker can't see the fixed point shrank.
+{
+  const shrunk = { endpoint: FP.endpoint, result: FP.result, method: FP.method, dataVintage: FP.dataVintage }; // no inputs
+  throws('shrunk fixed point (no inputs) is REJECTED, not emitted', () => provenanceBlock(shrunk));
+  throws('fixed point without endpoint is rejected (must bind the question)',
+    () => provenanceBlock({ inputs: FP.inputs, result: FP.result, method: FP.method, dataVintage: FP.dataVintage }));
+  throws('fixed point with extra member is rejected (spec §2.1 no other member)',
+    () => provenanceBlock({ ...FP, timestamp: '2026-08-23T00:00:00Z' }));
+  throws('fixed point with non-string endpoint is rejected', () => provenanceBlock({ ...FP, endpoint: 42 }));
+  // the declared list is the spec constant regardless of key order passed in
+  const reordered = { dataVintage: FP.dataVintage, method: FP.method, result: FP.result, inputs: FP.inputs, endpoint: FP.endpoint };
+  eq('declared fixedPoint list is the spec constant (not Object.keys order)',
+     provenanceBlock(reordered).fixedPoint, ['endpoint', 'inputs', 'result', 'method', 'dataVintage']);
+  eq('reordered keys hash identically (JCS sorts)', provenanceBlock(reordered).responseHash, EXPECTED);
+  // and a checker recomputing over the five spec fields detects a hash computed over a shrunk set
+  const shrunkHash = gvpHash(shrunk);
+  truthy('hash over shrunk set != hash over full fixed point (checker catches omission)', shrunkHash !== EXPECTED);
+  // express adapter: a shrunk builder degrades to no-provenance, never to a misleading block
+  const res = fakeRes();
+  expressProvenance(() => shrunk)({}, res, () => {});
+  res.json({ a: 1 });
+  eq('express: shrunk fixed point -> body served WITHOUT a provenance block', res.sent, { a: 1 });
+  truthy('express: shrunk fixed point -> error recorded', String(res.locals.gvpError).includes('missing required member'));
+}
+
 // 5. Round-trip: a consumer re-derives the hash from the emitted body - the whole point
 {
   const emitted = attachProvenance({ result: { selfEmploymentTax: 11303.64 } }, FP);

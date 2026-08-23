@@ -43,7 +43,7 @@ That is the whole of L1. If you already emit a signed receipt (x402, ACTA, or yo
 
 If you'd rather not hash by hand, the `middleware` export attaches `responseHash` to every JSON
 response under the standard `extensions["response-provenance"]` envelope. You supply
-`buildFixedPoint`, which returns the subset of the exchange that identifies the answer.
+`buildFixedPoint`, which returns the spec's fixed point `{endpoint, inputs, result, method, dataVintage}` — all five members required, no extras (spec §2.1).
 
 ```js
 import express from 'express';
@@ -67,7 +67,7 @@ app.use(honoProvenance((c, body) => ({ /* same shape */ })));
 
 Provenance never breaks serving: if `buildFixedPoint` returns falsy or throws, the response is emitted
 unchanged (Express records the error on `res.locals.gvpError`). The emitted block also lists which
-fields were hashed (`fixedPoint`), so a server can't silently omit one.
+fields were hashed (`fixedPoint`) — but that list is the **spec constant**, not a self-declared description. All five members are required and the set is closed, so a seller cannot shrink the fixed point (e.g. drop `inputs`) and stay internally consistent: a verifier always recomputes over the five spec members, and `endpoint`+`inputs` being required means the hash binds the *question* as well as the answer. (Both guarantees came out of review on x402-foundation/x402#3234.)
 
 ## What GVP proves — and what it doesn't
 
