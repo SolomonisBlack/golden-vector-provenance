@@ -34,5 +34,7 @@ for (const fname of ['attestation.json', 'attestation-v2.json']) {
   }
 }
 
+// Both vector files MUST be present: 8 (/1) + 8 (/2). A silently-missing file must not read as green.
+if (l2 !== 16) { fails++; console.error(`L2 VECTOR COUNT ${l2} != 16 — a vector file is missing`); }
 console.log(`JS conformance: ${expected.length} L1 + ${l2} L2 vectors, ${fails} failures`);
 process.exit(fails ? 1 : 0);

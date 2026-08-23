@@ -11,7 +11,7 @@ now fails the signature; `tools/check-l2-binding.mjs` reproduces the reviewer's 
 expects the flip. **`responseHash` is untouched** (not in the hashed L1 fixed point), so every hash and
 all L1 vectors are byte-identical. `GVP-Attestation/1` (legacy 6-field) stays valid for receipts already
 issued; shape is selected by the declared `payloadVersion` and NEVER guessed (no downgrade by trial).
-New vectors `vectors/attestation-v2.json` (8) — genuinely new inputs to test against. The unsigned L1
+New vectors `vectors/attestation-v2.json` — the same 8 canonicalization-adversarial cases (same fixed points, same `responseHash` values) re-signed under the `/2` shape; what is new is the signed payloads and signatures, not the inputs. The unsigned L1
 `fixedPointVersion` is now documented honestly as informational (unauthenticated on a bare response).
 
 ## 0.5.0 — 2026-08-23
