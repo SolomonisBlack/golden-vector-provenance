@@ -211,5 +211,5 @@ an issue — an external implementer is the single thing this most needs.
 - [x] Conformance suite (L1 + L2 golden vectors) passing in both references.
 - [x] Full verbatim Apache-2.0 + CC-BY-4.0 licence texts, copyright holder set.
 - [x] Publishable npm package (`golden-vector-provenance`) with `npm test` green from a clean install.
-- [ ] **Owner step:** push to a public repository and publish to npm.
+- [x] Published: public repo + npm `golden-vector-provenance` (0.2.0 → 0.4.0).
 - [ ] Revocation-list reference generator/verifier (schema + spec are done; a small signed-list signer/checker would round it out).

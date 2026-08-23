@@ -43,7 +43,8 @@
     "LICENSE",
     "LICENSE-APACHE-2.0",
     "LICENSE-CC-BY-4.0",
-    "middleware/index.mjs"
+    "middleware/index.mjs",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node middleware/test.mjs",
