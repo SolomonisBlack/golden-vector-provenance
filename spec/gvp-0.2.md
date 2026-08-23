@@ -50,6 +50,31 @@ are deliberate:
 A verifier MUST reject an artifact whose fixed point is missing any member or carries an extra one, and
 MUST recompute the hash over exactly these five members rather than over whatever an issuer declares.
 
+### 2.1.1 The fixed-point rule set is versioned by name, beside the hash
+The five-member definition above is a **named, frozen rule set**: **`GVP-FixedPoint/1`**. Because the
+fixed point is a constant rather than an issuer-declared list, a future change to the member set would
+otherwise be *silent*: a verifier built for one rule set and an issuer using another would compute
+different hashes over the same logical response, indistinguishable from a forged or corrupted hash. To
+make such skew visible and nameable rather than silent:
+
+- Any artifact that carries a `responseHash` MUST also carry the identifier of the rule set that defined
+  its fixed point, as a sibling field **`fixedPointVersion`** — e.g. in the x402 `response-provenance`
+  extension block and in the Verification Receipt (§5). For this document's rule set the value is the
+  string `"GVP-FixedPoint/1"`.
+- The identifier lives **beside** the hash, never inside the hashed payload. Placing it inside would
+  change every existing hash and break the §2.1 guarantee that the same fixed point always produces the
+  same hash; placing it beside costs nothing and achieves the goal, which is that a verifier can *name*
+  a mismatch.
+- A verifier MUST read `fixedPointVersion` before recomputing. An unknown or unsupported identifier MUST
+  be reported as **"unsupported fixed-point rule set"**, never as a hash mismatch or forgery.
+- **`GVP-FixedPoint/1` is frozen.** It will never gain or lose a member. A need for a different member
+  set MUST be published as a new identifier (`GVP-FixedPoint/2`, …) with its own conformance vectors; it
+  MUST NOT be introduced by editing this definition.
+
+This also resolves the document-vs-package versioning ambiguity: an attestation is produced under a
+named rule set (`GVP-FixedPoint/1`) and a named receipt format (`GVP-Receipt/0.2`, §5), not under "the
+spec at some package version"; those names are stable across document revisions.
+
 ### 2.2 Canonical JSON (byte-level; this is the interop boundary)
 Two implementations interoperate only if they produce **identical bytes** before hashing.
 

@@ -4,72 +4,202 @@
   "title": "GVP Verification Receipt",
   "description": "Audit-grade, portable record of a verified computed answer (Golden-Vector Provenance v0.2). Neutral, issuer-agnostic; $id is a placeholder pending the neutral-org home.",
   "type": "object",
-  "required": ["receiptVersion", "issuer", "issuedAt", "tool", "endpoint", "canonicalInputs", "result", "method", "dataVintage", "responseHash", "trustModel", "goldenVector", "recheckUrl", "howToVerify", "disclaimer"],
+  "required": [
+    "receiptVersion",
+    "issuer",
+    "issuedAt",
+    "tool",
+    "endpoint",
+    "canonicalInputs",
+    "result",
+    "method",
+    "dataVintage",
+    "responseHash",
+    "trustModel",
+    "goldenVector",
+    "recheckUrl",
+    "howToVerify",
+    "disclaimer"
+  ],
   "additionalProperties": true,
   "properties": {
-    "receiptVersion": { "const": "GVP-Receipt/0.2" },
+    "receiptVersion": {
+      "const": "GVP-Receipt/0.2"
+    },
     "issuer": {
       "type": "object",
-      "required": ["name", "service"],
+      "required": [
+        "name",
+        "service"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "service": { "type": "string" },
-        "url": { "type": "string", "format": "uri" }
+        "name": {
+          "type": "string"
+        },
+        "service": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
       }
     },
-    "issuedAt": { "type": "string", "format": "date-time", "description": "ISO-8601 issuance timestamp (in the attestation, NOT in responseHash)" },
-    "tool": { "type": "string" },
-    "endpoint": { "type": "string" },
-    "canonicalInputs": { "type": "object", "description": "the exact inputs the answer was computed from" },
-    "result": { "type": "object", "description": "the computed answer" },
-    "method": { "type": "string", "description": "formula / rule trace" },
-    "dataVintage": { "type": "string", "description": "declared dataset version (the only permitted axis of variation)" },
+    "issuedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 issuance timestamp (in the attestation, NOT in responseHash)"
+    },
+    "tool": {
+      "type": "string"
+    },
+    "endpoint": {
+      "type": "string"
+    },
+    "canonicalInputs": {
+      "type": "object",
+      "description": "the exact inputs the answer was computed from"
+    },
+    "result": {
+      "type": "object",
+      "description": "the computed answer"
+    },
+    "method": {
+      "type": "string",
+      "description": "formula / rule trace"
+    },
+    "dataVintage": {
+      "type": "string",
+      "description": "declared dataset version (the only permitted axis of variation)"
+    },
     "sources": {
       "type": "array",
-      "items": { "type": "object", "properties": { "label": { "type": "string" }, "ref": { "type": "string" }, "asOf": { "type": "string" } } }
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "asOf": {
+            "type": "string"
+          }
+        }
+      }
     },
-    "responseHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "description": "GVP hash over {endpoint, inputs, result, method, dataVintage}" },
-    "trustModel": { "const": "recompute-trust" },
+    "responseHash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "GVP hash over {endpoint, inputs, result, method, dataVintage}"
+    },
+    "trustModel": {
+      "const": "recompute-trust"
+    },
     "goldenVector": {
       "type": "object",
-      "required": ["reproduceUrl"],
-      "properties": { "reference": { "type": "string" }, "reproduceUrl": { "type": "string", "format": "uri" } }
+      "required": [
+        "reproduceUrl"
+      ],
+      "properties": {
+        "reference": {
+          "type": "string"
+        },
+        "reproduceUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
     },
-    "recheckUrl": { "type": "string", "format": "uri", "description": "free hash re-check endpoint" },
+    "recheckUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "free hash re-check endpoint"
+    },
     "onChainAnchor": {
       "oneOf": [
-        { "type": "null" },
+        {
+          "type": "null"
+        },
         {
           "type": "object",
-          "required": ["standard", "chain", "registry", "agentId"],
+          "required": [
+            "standard",
+            "chain",
+            "registry",
+            "agentId"
+          ],
           "properties": {
-            "standard": { "type": "string" },
-            "chain": { "type": "string" },
-            "chainId": { "type": "integer" },
-            "registry": { "type": "string" },
-            "agentId": { "type": "string" }
+            "standard": {
+              "type": "string"
+            },
+            "chain": {
+              "type": "string"
+            },
+            "chainId": {
+              "type": "integer"
+            },
+            "registry": {
+              "type": "string"
+            },
+            "agentId": {
+              "type": "string"
+            }
           }
         }
       ]
     },
-    "howToVerify": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "howToVerify": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
     "signature": {
       "oneOf": [
-        { "type": "null" },
+        {
+          "type": "null"
+        },
         {
           "type": "object",
-          "required": ["alg", "publicKey", "signature"],
+          "required": [
+            "alg",
+            "publicKey",
+            "signature"
+          ],
           "properties": {
-            "alg": { "const": "Ed25519" },
-            "publicKey": { "type": "string", "description": "base64 SPKI DER" },
-            "signature": { "type": "string", "description": "base64" },
-            "keyId": { "type": "string" },
-            "signed": { "type": "string" },
-            "note": { "type": "string" }
+            "alg": {
+              "const": "Ed25519"
+            },
+            "publicKey": {
+              "type": "string",
+              "description": "base64 SPKI DER"
+            },
+            "signature": {
+              "type": "string",
+              "description": "base64"
+            },
+            "keyId": {
+              "type": "string"
+            },
+            "signed": {
+              "type": "string"
+            },
+            "note": {
+              "type": "string"
+            }
           }
         }
       ]
     },
-    "disclaimer": { "type": "string" }
+    "disclaimer": {
+      "type": "string"
+    },
+    "fixedPointVersion": {
+      "const": "GVP-FixedPoint/1",
+      "description": "Identifier of the frozen rule set that defined the hashed fixed point (spec \u00a72.1.1). Lives beside responseHash, never inside the hashed payload, so a verifier can name a rule-set mismatch instead of reading it as a forged hash."
+    }
   }
 }

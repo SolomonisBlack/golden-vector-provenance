@@ -2,7 +2,7 @@
 // fakes so the suite runs from a clean clone. Exit non-zero on any failure.
 import { gvpHash } from '../ref/js/gvp.mjs';
 import {
-  EXTENSION_KEY, SPEC_URL, provenanceBlock, attachProvenance, expressProvenance, honoProvenance,
+  EXTENSION_KEY, SPEC_URL, FIXED_POINT_VERSION, provenanceBlock, attachProvenance, expressProvenance, honoProvenance,
 } from './index.mjs';
 
 let fails = 0;
@@ -126,6 +126,17 @@ throws('honoProvenance requires a function', () => honoProvenance(123));
   res.json({ a: 1 });
   eq('express: shrunk fixed point -> body served WITHOUT a provenance block', res.sent, { a: 1 });
   truthy('express: shrunk fixed point -> error recorded', String(res.locals.gvpError).includes('missing required member'));
+}
+
+// 4c. Rule-set version discriminator (spec §2.1.1, from review on x402-foundation/x402#3234):
+//     emitted BESIDE the hash so skew is nameable; MUST NOT change any hash (it is not inside the payload).
+{
+  const b = provenanceBlock(FP);
+  eq('block carries fixedPointVersion', b.fixedPointVersion, 'GVP-FixedPoint/1');
+  eq('fixedPointVersion does NOT alter responseHash (lives beside, not inside)', b.responseHash, EXPECTED);
+  truthy('FIXED_POINT_VERSION exported and frozen string', FIXED_POINT_VERSION === 'GVP-FixedPoint/1');
+  // the spec vectors (hashed before this field existed) still reproduce — backwards compatible
+  eq('existing expected.json hashes unchanged by versioning', gvpHash(FP), EXPECTED);
 }
 
 // 5. Round-trip: a consumer re-derives the hash from the emitted body - the whole point

@@ -20,6 +20,10 @@ export const EXTENSION_KEY = 'response-provenance';
 export const SPEC_URL = 'https://github.com/SolomonisBlack/golden-vector-provenance';
 // The spec's fixed-point members, in canonical order. Constant by design — see guarantee 1 above.
 export const FIXED_POINT_FIELDS = Object.freeze(['endpoint', 'inputs', 'result', 'method', 'dataVintage']);
+// Named, frozen rule-set identifier for that member set (spec §2.1.1). Emitted BESIDE the hash, never
+// inside it, so a verifier can name a rule-set mismatch instead of mistaking it for a forged hash, and
+// existing hashes stay valid. A different member set is a NEW identifier, never an edit of this one.
+export const FIXED_POINT_VERSION = 'GVP-FixedPoint/1';
 
 // Validate a candidate fixed point against spec §2.1: exactly these members, no extras, no missing.
 // Throws with a precise message so a misconfigured buildFixedPoint fails loudly in development.
@@ -45,6 +49,7 @@ export function provenanceBlock(fixedPoint) {
   return {
     responseHash: gvpHash(fixedPoint),
     fixedPoint: [...FIXED_POINT_FIELDS],   // the spec constant — declaration cannot drift from the hash
+    fixedPointVersion: FIXED_POINT_VERSION, // which rule set defined "these five" — skew is nameable
     spec: SPEC_URL,
   };
 }
