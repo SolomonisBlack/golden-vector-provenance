@@ -1,6 +1,6 @@
 {
   "name": "golden-vector-provenance",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Reproducible provenance for computed answers: a canonical SHA-256 fixed point (RFC 8785 JCS) that anyone can re-derive for free, so you recompute the answer instead of trusting the server.",
   "keywords": [
     "provenance",
@@ -28,7 +28,8 @@
     "./schema/revocation-list": "./schema/revocation-list.schema.json",
     "./vectors": "./vectors/expected.json",
     "./package.json": "./package.json",
-    "./middleware": "./middleware/index.mjs"
+    "./middleware": "./middleware/index.mjs",
+    "./vectors/attestation-v2": "./vectors/attestation-v2.json"
   },
   "files": [
     "index.mjs",
@@ -47,12 +48,13 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node middleware/test.mjs",
+    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node middleware/test.mjs",
     "check:l1l2": "node tools/check-js.mjs",
     "check:jcs": "node tools/check-jcs.mjs",
     "vectors": "node tools/gen-vectors.mjs",
     "attestation": "node tools/gen-attestation.mjs",
-    "check:mw": "node middleware/test.mjs"
+    "check:mw": "node middleware/test.mjs",
+    "check:l2": "node tools/check-l2-binding.mjs"
   },
   "devDependencies": {
     "canonicalize": "^2.1.0"

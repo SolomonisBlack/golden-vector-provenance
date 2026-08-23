@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.0 — 2026-08-23
+**`fixedPointVersion` is now bound — inside the signed L2 payload.** Round 3 of external review on
+x402-foundation/x402#3234 demonstrated against 0.5.0 that the field, emitted beside the hash but
+*outside* the signed payload, could be **stripped** (a 0.5 receipt became indistinguishable from 0.4 —
+the silent skew 0.5.0 meant to close) or **forged** to an unsupported rule set (denial of verification)
+while the signature still verified. Fix: a second signed-payload shape **`GVP-Attestation/2`** adds
+`payloadVersion` + `fixedPointVersion` INSIDE the Ed25519-signed object (spec §6). Stripping or forging
+now fails the signature; `tools/check-l2-binding.mjs` reproduces the reviewer's four-case table and
+expects the flip. **`responseHash` is untouched** (not in the hashed L1 fixed point), so every hash and
+all L1 vectors are byte-identical. `GVP-Attestation/1` (legacy 6-field) stays valid for receipts already
+issued; shape is selected by the declared `payloadVersion` and NEVER guessed (no downgrade by trial).
+New vectors `vectors/attestation-v2.json` (8) — genuinely new inputs to test against. The unsigned L1
+`fixedPointVersion` is now documented honestly as informational (unauthenticated on a bare response).
+
 ## 0.5.0 — 2026-08-23
 **Additive, no hash change.** The fixed-point member set is now a **named, frozen rule set,
 `GVP-FixedPoint/1`** (spec §2.1.1). The middleware emits `fixedPointVersion: "GVP-FixedPoint/1"` beside

@@ -1,5 +1,6 @@
 {
   "alg": "Ed25519",
+  "payloadVersion": "GVP-Attestation/1",
   "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
   "vectors": [
     {

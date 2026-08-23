@@ -21,8 +21,14 @@ export const SPEC_URL = 'https://github.com/SolomonisBlack/golden-vector-provena
 // The spec's fixed-point members, in canonical order. Constant by design — see guarantee 1 above.
 export const FIXED_POINT_FIELDS = Object.freeze(['endpoint', 'inputs', 'result', 'method', 'dataVintage']);
 // Named, frozen rule-set identifier for that member set (spec §2.1.1). Emitted BESIDE the hash, never
-// inside it, so a verifier can name a rule-set mismatch instead of mistaking it for a forged hash, and
-// existing hashes stay valid. A different member set is a NEW identifier, never an edit of this one.
+// inside it, so existing hashes stay valid. A different member set is a NEW identifier, never an edit.
+//
+// HONEST SCOPE (from round 3 of review on x402-foundation/x402#3234): on a bare L1 response this field
+// is a plain string — it is NOT authenticated and CAN be stripped or forged, because nothing signs a bare
+// L1 response. It is made tamper-evident only at L2: `attestationPayload` (ref/js/attest.mjs) with
+// payloadVersion GVP-Attestation/2 puts fixedPointVersion INSIDE the Ed25519-signed payload, so stripping
+// or forging it there fails the signature. L1 = re-derivable; L2 = re-derivable AND the rule-set claim is
+// bound. Do not describe the L1 field as tamper-proof.
 export const FIXED_POINT_VERSION = 'GVP-FixedPoint/1';
 
 // Validate a candidate fixed point against spec §2.1: exactly these members, no extras, no missing.
@@ -49,7 +55,7 @@ export function provenanceBlock(fixedPoint) {
   return {
     responseHash: gvpHash(fixedPoint),
     fixedPoint: [...FIXED_POINT_FIELDS],   // the spec constant — declaration cannot drift from the hash
-    fixedPointVersion: FIXED_POINT_VERSION, // which rule set defined "these five" — skew is nameable
+    fixedPointVersion: FIXED_POINT_VERSION, // which rule set defined "these five" — nameable at L1, BOUND only at L2 (signed payload)
     spec: SPEC_URL,
   };
 }

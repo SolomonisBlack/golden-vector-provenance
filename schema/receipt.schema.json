@@ -189,6 +189,13 @@
             },
             "note": {
               "type": "string"
+            },
+            "payloadVersion": {
+              "enum": [
+                "GVP-Attestation/1",
+                "GVP-Attestation/2"
+              ],
+              "description": "Which signed-payload shape was signed (spec \u00a76). Absent = /1 (legacy). Informational copy; the authoritative value is INSIDE the signed payload, which the verifier reconstructs per the declared shape and never guesses."
             }
           }
         }
@@ -199,7 +206,7 @@
     },
     "fixedPointVersion": {
       "const": "GVP-FixedPoint/1",
-      "description": "Identifier of the frozen rule set that defined the hashed fixed point (spec \u00a72.1.1). Lives beside responseHash, never inside the hashed payload, so a verifier can name a rule-set mismatch instead of reading it as a forged hash."
+      "description": "Identifier of the frozen rule set that defined the hashed fixed point (spec \u00a72.1.1). Lives beside responseHash, never inside the hashed payload. NOTE: as a bare receipt field this is UNAUTHENTICATED; it is bound only when the receipt is signed under attestation payload shape GVP-Attestation/2, where it is a member of the signed payload (spec \u00a76). A verifier MUST take it from the signed payload, not from this field."
     }
   }
 }

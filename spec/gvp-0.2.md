@@ -64,12 +64,18 @@ make such skew visible and nameable rather than silent:
   section existed carry no `fixedPointVersion`; the receipt schema therefore keeps it OPTIONAL so those
   receipts remain valid. A verifier MUST treat a receipt with no `fixedPointVersion` as
   `"GVP-FixedPoint/1"` (the only rule set that has ever existed). New receipts SHOULD carry it.
-- The identifier lives **beside** the hash, never inside the hashed payload. Placing it inside would
-  change every existing hash and break the §2.1 guarantee that the same fixed point always produces the
-  same hash; placing it beside costs nothing and achieves the goal, which is that a verifier can *name*
-  a mismatch.
+- The identifier lives **beside** the hash, never inside the hashed L1 fixed point. Placing it inside
+  would change every existing hash and break the §2.1 guarantee that the same fixed point always
+  produces the same hash.
+- **Where it is bound.** At L1 (a bare response, no signature) `fixedPointVersion` is an unauthenticated
+  string: it CAN be stripped or forged, because nothing signs a bare L1 response. This document does
+  NOT claim otherwise. It becomes **tamper-evident at L2**: under signed-payload shape
+  `GVP-Attestation/2` (§6) the identifier is a member of the **Ed25519-signed attestation payload**, so
+  stripping or forging it fails the signature. L1 therefore proves *re-derivability*; L2 proves
+  re-derivability **and** binds the rule-set claim. An issuer that needs the claim bound MUST emit L2.
 - A verifier MUST read `fixedPointVersion` before recomputing. An unknown or unsupported identifier MUST
-  be reported as **"unsupported fixed-point rule set"**, never as a hash mismatch or forgery.
+  be reported as **"unsupported fixed-point rule set"**, never as a hash mismatch or forgery. At L2 the
+  verifier MUST take the identifier from the *signed payload*, never from an unsigned sibling field.
 - **`GVP-FixedPoint/1` is frozen.** It will never gain or lose a member. A need for a different member
   set MUST be published as a new identifier (`GVP-FixedPoint/2`, …) with its own conformance vectors; it
   MUST NOT be introduced by editing this definition.
@@ -174,13 +180,31 @@ A **receipt** is a portable record wrapping a fixed point plus its recompute-tru
 
 ## 6. Ed25519 attestation (L2)
 
-The issuer signs the **attestation payload**, which is the canonical JSON (§2.2) of:
+The issuer signs the **attestation payload**, the canonical JSON (§2.2) of a **named payload shape**.
+Two shapes are defined; the shape identifier is itself a member of the signed object, so a verifier
+learns which shape to reconstruct *from the receipt* and an attacker cannot strip or forge it without
+failing the signature:
 
 ```
+GVP-Attestation/1  (legacy — receipts issued before fixedPointVersion existed; no payloadVersion member)
 { "responseHash": <string>, "endpoint": <string>, "dataVintage": <string>,
   "issuer": <string>, "agentId": <string|null>, "issuedAt": <RFC3339 string> }
+
+GVP-Attestation/2  (current)
+{ "responseHash": <string>, "endpoint": <string>, "dataVintage": <string>,
+  "issuer": <string>, "agentId": <string|null>, "issuedAt": <RFC3339 string>,
+  "payloadVersion": "GVP-Attestation/2", "fixedPointVersion": "GVP-FixedPoint/1" }
 ```
 
+- **Shape selection is explicit, never guessed.** A payload with no `payloadVersion` member is shape
+  `/1`. A verifier MUST reconstruct the shape the receipt declares and MUST NOT try alternatives on
+  failure (trying shapes until one verifies would let an attacker downgrade a `/2` receipt to `/1`).
+  New receipts SHOULD be `/2`; `/1` remains valid for receipts already issued.
+- **`fixedPointVersion` is bound here, at L2** — inside the signed payload — and nowhere else. It is
+  deliberately NOT inside the hashed L1 fixed point (that would move every existing `responseHash`) and
+  its unsigned L1 sibling (§2.1.1) is informational only.
+- `/1` and `/2` sign different byte strings for the same logical receipt; that is intended and the
+  conformance vectors cover both (`vectors/attestation.json`, `vectors/attestation-v2.json`).
 - Algorithm: **Ed25519** (RFC 8032), over the UTF-8 bytes of that canonical string. Because Ed25519 is
   deterministic, independent conformant signers produce identical signature bytes for the same key and
   payload.
