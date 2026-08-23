@@ -59,8 +59,11 @@ make such skew visible and nameable rather than silent:
 
 - Any artifact that carries a `responseHash` MUST also carry the identifier of the rule set that defined
   its fixed point, as a sibling field **`fixedPointVersion`** — e.g. in the x402 `response-provenance`
-  extension block and in the Verification Receipt (§5). For this document's rule set the value is the
-  string `"GVP-FixedPoint/1"`.
+  extension block. For this document's rule set the value is the string `"GVP-FixedPoint/1"`.
+  **Backward-compatibility carve-out for the Verification Receipt (§5):** receipts issued before this
+  section existed carry no `fixedPointVersion`; the receipt schema therefore keeps it OPTIONAL so those
+  receipts remain valid. A verifier MUST treat a receipt with no `fixedPointVersion` as
+  `"GVP-FixedPoint/1"` (the only rule set that has ever existed). New receipts SHOULD carry it.
 - The identifier lives **beside** the hash, never inside the hashed payload. Placing it inside would
   change every existing hash and break the §2.1 guarantee that the same fixed point always produces the
   same hash; placing it beside costs nothing and achieves the goal, which is that a verifier can *name*
