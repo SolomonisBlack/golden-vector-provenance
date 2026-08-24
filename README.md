@@ -156,6 +156,43 @@ the vectors and runs from a clean clone with no external paths.
   [x402toll.com](https://x402toll.com) (verified by the maintainer against that codebase; see the
   `GVP_CALC_CORE` cross-check above), so hashes issued by that service re-derive under this reference.
 
+### Independent third-party cross-check
+
+Everything above is run by this repo. The strongest evidence is the check somebody else ran, with
+their own code, against vectors they fetched rather than ones we handed them:
+
+**[whawk46/x402-jcs-crosscheck](https://github.com/whawk46/x402-jcs-crosscheck)** — `npm install && npm test`
+reproduces the full table (reported 2026-08-23, in the review of
+[x402-foundation/x402#3234](https://github.com/x402-foundation/x402/issues/3234)):
+
+```
+L1  vectors/expected.json     8/8 hashes match
+L2  /1  attestation.json      8/8 canonical bytes identical · 8/8 signatures verify
+L2  /2  attestation-v2.json   8/8 canonical bytes identical · 8/8 signatures verify
+                              -> 24/24
+```
+
+Plus the negative controls, each of which MUST fail — and does:
+
+```
+fixedPointVersion stripped     -> fails correctly
+forged to GVP-FixedPoint/2     -> fails correctly
+downgraded to the /1 shape     -> fails correctly
+CONTROL: issuer tampered       -> fails correctly
+```
+
+Two properties make it evidence rather than a mirror, both their choices, not ours:
+
+- **Vectors are pinned, not vendored** — fetched at commit `6111a5f9` and checked against recorded
+  sha256 digests, so it exercises *our published* vectors, not a copy that could drift.
+- **Their canonicalizer is a dependency, not a copy** — a reader exercises the implementation that
+  actually ships, and signatures are verified over **their** bytes, not ours.
+
+**What it does not cover**, stated in their README and repeated here rather than buried: this is
+evidence about *canonicalization*, not about their signing path, which refuses fractional numbers by
+design — the region our vectors live in. It is also not adoption: GVP still has no external
+implementers, and an independent verification is not the same claim.
+
 ## The test key is a test key
 
 `vectors/attestation-key.json` contains a **fixed throwaway private key**, published deliberately so
