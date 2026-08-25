@@ -108,11 +108,13 @@ is the whole reason the identifier exists.
 An issuer MUST NOT emit a `responseHash` for a response whose `result` depends on anything not in the
 fixed point — a clock, a live feed, mutable server state. Such an endpoint is out of scope for GVP.
 
-This exists to make a finding **falsifiable**. If hidden inputs were allowed, a failed re-derivation
-would have two explanations — the artifact was altered, or the data legitimately moved — and no
-verifier could tell them apart. Forbidding the second makes the first the only one left, so a verifier
-that recomputes and gets different bytes has found a real defect, and "the data moved" is not available
-as an answer. Time-varying data is not excluded; *hidden* time-varying data is. Lift the rate into
+This exists to make a finding **falsifiable — which is not the same as attributable**, and the
+difference matters. A MUST NOT does not make a violation impossible; it makes it a violation. So a
+failed re-derivation means the artifact was altered **or** the issuer emitted a hash it was not
+permitted to emit. Both are defects, and a verifier does not need to decide which — which is the point,
+because deciding would require seeing the issuer's internals that a third party cannot see. A finding
+should be stated as that disjunction rather than picking a branch. "The data moved" stops being a
+defence and becomes an admission of the second branch. Time-varying data is not excluded; *hidden* time-varying data is. Lift the rate into
 `inputs` or into the `dataVintage` axis and it is conformant again. Spec §2.1.2.
 
 Both of the above came from @seancrecord (scvd.store conformance desk) reviewing this spec for a

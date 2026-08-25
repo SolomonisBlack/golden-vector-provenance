@@ -96,17 +96,31 @@ mutable server state, or any value the verifier cannot see in `{endpoint, inputs
 that endpoint is **out of scope for GVP** and MUST NOT claim conformance at any level.
 
 The hidden-input case is why this must be normative rather than advisory. Consider a re-derivation that
-fails. Two explanations compete:
+fails. Before this section existed, two explanations competed:
 
 1. the artifact was altered, or
 2. the result legitimately moved, because it depended on something outside the fixed point.
 
-If (2) is permitted, no failed re-derivation can ever be attributed, and `responseHash` degrades from
-evidence into a claim about the issuer's good intentions. Forbidding (2) is what makes (1) the only
-remaining explanation, and therefore what makes a finding **falsifiable**: a verifier that recomputes
-over the declared fixed point and gets different bytes has found a real defect, and the issuer cannot
-answer "the data moved" — because an issuer for whom the data can move is not permitted to emit the
-hash in the first place.
+While (2) is permitted, no failed re-derivation can be acted on at all, and `responseHash` degrades from
+evidence into a claim about the issuer's good intentions — the issuer answers "the data moved" and the
+verifier has no reply.
+
+**What this section does, stated precisely.** A normative MUST NOT does not make (2) impossible; it
+makes (2) a violation. So a failed re-derivation now means:
+
+1. the artifact was altered, **or**
+2. the issuer emitted a `responseHash` it was not permitted to emit.
+
+**Both are defects, and a verifier does not need to decide which one it is** for the finding to stand.
+That is the property that matters, and it is stronger than attribution: deciding between (1) and (2)
+would require seeing the issuer's internals, which a third-party verifier by definition cannot do.
+Requiring attribution would make the check unissuable by exactly the parties it exists to serve. "The
+data moved" is no longer a defence, because an issuer for whom the data can move was never permitted to
+emit the hash — the answer stops being an excuse and becomes an admission of (2).
+
+A finding SHOULD therefore be stated as the disjunction rather than picking a side: *this hash does not
+re-derive from the declared fixed point; the artifact was altered or it was issued in violation of
+§2.1.2.* Naming one branch that the verifier cannot actually distinguish would overclaim.
 
 Time-varying data is not excluded from GVP; **hidden** time-varying data is. A live rate becomes
 conformant the moment it is lifted into the fixed point — as an explicit member of `inputs` (the quoted
@@ -114,7 +128,10 @@ rate the caller supplied or the issuer echoes back), or as the `dataVintage` axi
 discipline is that everything the answer depends on is visible to the party checking it.
 
 *Rationale: raised by @seancrecord (scvd.store conformance desk, 2026-08-24), who observed that a defect
-class is only usable if it carries what would falsify it. GVP had no such sentence; this is it.*
+class is only usable if it carries what would falsify it. GVP had no such sentence; this is it. The
+falsifiable-but-not-attributable distinction, and the requirement to state the finding as a disjunction,
+are theirs too (2026-08-25) — the first draft of this section claimed forbidding (2) left (1) as "the
+only remaining explanation", which is false: a rule does not prevent its own violation.*
 
 ### 2.1.3 `dataVintage` MUST be machine-comparable (rule-set change — see §2.1.1)
 
