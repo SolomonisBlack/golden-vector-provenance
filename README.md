@@ -82,6 +82,42 @@ fields were hashed (`fixedPoint`) — but that list is the **spec constant**, no
 This distinction is the point of the standard, and it is deliberate. GVP is **not** a fact-checker,
 an oracle, an endorsement, or a certification.
 
+## `GVP-FixedPoint/2` — `dataVintage` is now machine-comparable
+
+`/1` typed `dataVintage` only as `<string>`. **JCS canonicalizes the JSON, not the semantics of a
+value**, so two honest implementations describing the same data year as `"July 2026"`, `"2026-07"`,
+`"2026.0"` or an epoch int all produced well-formed, conformant, *mutually irreproducible* hashes.
+
+That was not hypothetical — this repo's own vectors used `"2026.0"` while its reference service
+published `"July 2026"`. One project, two representations, neither wrong under the old text.
+
+Under **`GVP-FixedPoint/2`**, `dataVintage` MUST be an ISO 8601 calendar date at reduced precision —
+`YYYY`, `YYYY-MM`, or `YYYY-MM-DD`, matching `^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$`, and a real date at
+that precision. Nothing else. Precision is significant: `"2026"`, `"2026-07"` and `"2026-07-01"` are
+three vintages and hash differently. Lexical order equals chronological order, so a verifier can
+compare vintages without parsing. Spec §2.1.3; vectors `vectors/expected-v2.json`; gate
+`tools/check-fixedpoint-2.mjs` (11 vectors + 7 rejection cases, and it re-proves `/1` is frozen).
+
+**`/1` is unchanged and still valid.** It is frozen; receipts declaring it verify under its rules. A
+migration to `/2` re-hashes and declares `fixedPointVersion: "GVP-FixedPoint/2"` — and because that
+identifier sits inside the signed payload at L2, the migration is detectable rather than silent. That
+is the whole reason the identifier exists.
+
+## Closure: the result MUST be a function of the fixed point
+
+An issuer MUST NOT emit a `responseHash` for a response whose `result` depends on anything not in the
+fixed point — a clock, a live feed, mutable server state. Such an endpoint is out of scope for GVP.
+
+This exists to make a finding **falsifiable**. If hidden inputs were allowed, a failed re-derivation
+would have two explanations — the artifact was altered, or the data legitimately moved — and no
+verifier could tell them apart. Forbidding the second makes the first the only one left, so a verifier
+that recomputes and gets different bytes has found a real defect, and "the data moved" is not available
+as an answer. Time-varying data is not excluded; *hidden* time-varying data is. Lift the rate into
+`inputs` or into the `dataVintage` axis and it is conformant again. Spec §2.1.2.
+
+Both of the above came from @seancrecord (scvd.store conformance desk) reviewing this spec for a
+conformance-check implementation, 2026-08-24.
+
 ## Conformance levels
 - **L1 — Reproducible:** the response carries the canonical hash and a free re-derivation path.
 - **L2 — Signed:** L1 + an Ed25519 issuer attestation with a key-id (old keys stay verifiable).

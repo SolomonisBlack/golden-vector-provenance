@@ -48,13 +48,15 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node middleware/test.mjs",
+    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-fixedpoint-2.mjs && node middleware/test.mjs",
     "check:l1l2": "node tools/check-js.mjs",
     "check:jcs": "node tools/check-jcs.mjs",
     "vectors": "node tools/gen-vectors.mjs",
     "attestation": "node tools/gen-attestation.mjs",
     "check:mw": "node middleware/test.mjs",
-    "check:l2": "node tools/check-l2-binding.mjs"
+    "check:l2": "node tools/check-l2-binding.mjs",
+    "check:fp2": "node tools/check-fixedpoint-2.mjs",
+    "vectors:v2": "node tools/gen-vectors-v2.mjs"
   },
   "devDependencies": {
     "canonicalize": "^2.1.0"

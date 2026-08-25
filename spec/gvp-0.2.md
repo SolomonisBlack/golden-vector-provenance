@@ -84,6 +84,79 @@ This also resolves the document-vs-package versioning ambiguity: an attestation 
 named rule set (`GVP-FixedPoint/1`) and a named receipt format (`GVP-Receipt/0.2`, §5), not under "the
 spec at some package version"; those names are stable across document revisions.
 
+### 2.1.2 Closure: the result MUST be a function of the fixed point (normative)
+
+The rule above says the same fixed point always produces the same hash. That is a statement about
+*hashing*. This section states the matching requirement about *issuing*, because without it a failed
+re-derivation is unfalsifiable.
+
+**An issuer MUST NOT emit a `responseHash` for a response whose `result` depends on any input not
+present in the fixed point.** If reproducing `result` requires a clock, a live feed, a random draw,
+mutable server state, or any value the verifier cannot see in `{endpoint, inputs, method, dataVintage}`,
+that endpoint is **out of scope for GVP** and MUST NOT claim conformance at any level.
+
+The hidden-input case is why this must be normative rather than advisory. Consider a re-derivation that
+fails. Two explanations compete:
+
+1. the artifact was altered, or
+2. the result legitimately moved, because it depended on something outside the fixed point.
+
+If (2) is permitted, no failed re-derivation can ever be attributed, and `responseHash` degrades from
+evidence into a claim about the issuer's good intentions. Forbidding (2) is what makes (1) the only
+remaining explanation, and therefore what makes a finding **falsifiable**: a verifier that recomputes
+over the declared fixed point and gets different bytes has found a real defect, and the issuer cannot
+answer "the data moved" — because an issuer for whom the data can move is not permitted to emit the
+hash in the first place.
+
+Time-varying data is not excluded from GVP; **hidden** time-varying data is. A live rate becomes
+conformant the moment it is lifted into the fixed point — as an explicit member of `inputs` (the quoted
+rate the caller supplied or the issuer echoes back), or as the `dataVintage` axis (§2.1.3). The
+discipline is that everything the answer depends on is visible to the party checking it.
+
+*Rationale: raised by @seancrecord (scvd.store conformance desk, 2026-08-24), who observed that a defect
+class is only usable if it carries what would falsify it. GVP had no such sentence; this is it.*
+
+### 2.1.3 `dataVintage` MUST be machine-comparable (rule-set change — see §2.1.1)
+
+`dataVintage` was previously typed only as `<string>`, with no constraint on its representation. That is
+not sufficient for interop, and the failure mode is specific: **JCS canonicalizes the JSON, not the
+semantics of a value.** Two honest implementations describing the same data year as `"July 2026"`,
+`"2026-07"`, `"2026.0"` and `1783987200` all produce well-formed, spec-conformant, *mutually
+irreproducible* hashes over otherwise identical data.
+
+This is not hypothetical. At the time of writing this repository's own conformance vectors used
+`"2026.0"` while its reference service published `"July 2026"` — one project, two representations of the
+same data year, neither wrong under the old text.
+
+Under **`GVP-FixedPoint/2`**, `dataVintage` MUST be an **ISO 8601 calendar date at reduced precision**,
+one of exactly three forms, and nothing else:
+
+```
+YYYY          e.g. "2026"        the data is current as of that year
+YYYY-MM       e.g. "2026-07"     … that month
+YYYY-MM-DD    e.g. "2026-07-01"  … that day
+```
+
+Normative rules for `GVP-FixedPoint/2`:
+
+- The value MUST match `^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$` and MUST be a real calendar date at the
+  precision given. A verifier MUST reject a fixed point whose `dataVintage` does not match.
+- Precision is **significant**, not decorative: `"2026"`, `"2026-07"` and `"2026-07-01"` are three
+  different vintages and hash differently. Declare the precision you actually have; padding a year out
+  to a day asserts a currency you cannot support.
+- No time component, no timezone, no offset. `dataVintage` denotes the currency of the underlying
+  reference data, not an instant. A timestamp still MUST NOT enter the fixed point (§2.1).
+- Ordering falls out for free: under this grammar lexical comparison equals chronological comparison, so
+  a verifier can decide which of two vintages is newer without parsing.
+
+`GVP-FixedPoint/1` is unchanged and remains valid: it is frozen, and receipts declaring it MUST still be
+verified under its rules (§2.1.1). Its `dataVintage` stays an unconstrained `<string>`. An implementation
+moving to `/2` re-hashes its artifacts under the new rule set and declares
+`fixedPointVersion: "GVP-FixedPoint/2"`; because that identifier is inside the signed payload at L2
+(§6), the migration is detectable rather than silent — which is the entire reason the identifier exists.
+
+*Rationale: raised by @seancrecord (scvd.store conformance desk, 2026-08-24).*
+
 ### 2.2 Canonical JSON (byte-level; this is the interop boundary)
 Two implementations interoperate only if they produce **identical bytes** before hashing.
 
