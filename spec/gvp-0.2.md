@@ -122,6 +122,23 @@ A finding SHOULD therefore be stated as the disjunction rather than picking a si
 re-derive from the declared fixed point; the artifact was altered or it was issued in violation of
 §2.1.2.* Naming one branch that the verifier cannot actually distinguish would overclaim.
 
+**There is a third branch, and it is not the issuer's.** A re-derivation can also fail because:
+
+3. the *verifier's* canonicalization is wrong.
+
+JCS is precisely the surface where that happens quietly — number formatting, non-ASCII escaping, key
+ordering across surrogate pairs. A verifier whose canonicalizer is a hair off produces failed
+re-derivations against perfectly clean artifacts, and from the outside those findings are
+indistinguishable from (1) and (2). In that state the verifier is the defect, publishing accusations
+against issuers who did nothing wrong.
+
+(3) is deliberately **not** a third clause in the finding. A finding that hedged "…or our own arithmetic
+may be broken" would be unusable. It is instead excluded *before* a finding may be stated — see
+**§8.1**, which makes verifier conformance a precondition rather than an assumption. That is the same
+move as §2.1.2 itself: the earlier draft of this section reasoned in a world where issuers obey the
+rule; naming (3) without §8.1 would reason in a world where the verifier's arithmetic is correct.
+Neither is the world a conformance desk operates in.
+
 Time-varying data is not excluded from GVP; **hidden** time-varying data is. A live rate becomes
 conformant the moment it is lifted into the fixed point — as an explicit member of `inputs` (the quoted
 rate the caller supplied or the issuer echoes back), or as the `dataVintage` axis (§2.1.3). The
@@ -336,6 +353,43 @@ canonical-hash fixtures. An implementation is **L1-conformant** iff it reproduce
 L2 conformance additionally requires reproducing the attestation vectors in `vectors/attestation.json`
 (sign-and-verify round trips and a cross-implementation verify). The suite MUST pass in at least two
 independent implementations; the repo ships JS (`ref/js`) and Python (`ref/py`) references that do.
+
+### 8.1 Verifier conformance is a precondition for stating a finding (normative)
+
+Sections 2.1.2 and 3 constrain **issuers**. This section constrains **verifiers**, because a verifier
+that publishes findings is making accusations, and an accusation produced by a broken canonicalizer is
+a defect in the verifier rather than in the artifact.
+
+**A party MUST NOT state a finding that a `responseHash` fails to re-derive unless its own
+canonicalizer, at the time of the finding, passes all of:**
+
+1. **the L1 vectors** — reproduces every `expectedHash` in `vectors/expected.json` byte-for-byte;
+2. **the JCS equivalence gate** — its canonical output is byte-identical to an *independent* RFC 8785
+   implementation across the published probe set (this repo: `tools/check-jcs.mjs`, which covers key
+   ordering including non-ASCII and shared-prefix keys, the ECMAScript number edge cases, `-0`,
+   safe-integer bounds, raw UTF-8, emoji and surrogate pairs, control characters, unescaped solidus,
+   and empty containers);
+3. **the vectors of the rule set it is checking** — for `GVP-FixedPoint/2`, additionally
+   `vectors/expected-v2.json`, including the `dataVintage` rejection cases (§2.1.3).
+
+In this repository the three together are one command:
+
+```bash
+npm run verifier-precondition     # check-js (L1 vectors) + check-jcs (independent RFC 8785) + check-fixedpoint-2 (/2 + rejects)
+```
+
+A verifier that cannot demonstrate this MUST NOT publish the finding. It MAY report that it was unable
+to verify, which is a statement about itself and not about the issuer — and those are different claims
+that MUST NOT be conflated.
+
+This excludes branch (3) of §2.1.2 **by construction rather than by assumption**. It is deliberately
+cheap to satisfy: the vectors and both gates are published in this repository and run offline with no
+network and no issuer cooperation, so the precondition costs a verifier one test run, not a
+relationship with the party it is auditing.
+
+*Rationale: raised by @seancrecord (scvd.store conformance desk, 2026-08-25), who observed that the
+corrected §2.1.2 still reasoned in a world where the verifier's own arithmetic is correct, and that the
+remedy is a precondition on issuing a finding rather than another branch inside one.*
 
 ## 9. Security considerations
 

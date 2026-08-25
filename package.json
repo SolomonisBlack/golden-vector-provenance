@@ -56,7 +56,8 @@
     "check:mw": "node middleware/test.mjs",
     "check:l2": "node tools/check-l2-binding.mjs",
     "check:fp2": "node tools/check-fixedpoint-2.mjs",
-    "vectors:v2": "node tools/gen-vectors-v2.mjs"
+    "vectors:v2": "node tools/gen-vectors-v2.mjs",
+    "verifier-precondition": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-fixedpoint-2.mjs"
   },
   "devDependencies": {
     "canonicalize": "^2.1.0"

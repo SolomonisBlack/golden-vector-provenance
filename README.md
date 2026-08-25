@@ -114,7 +114,18 @@ failed re-derivation means the artifact was altered **or** the issuer emitted a 
 permitted to emit. Both are defects, and a verifier does not need to decide which — which is the point,
 because deciding would require seeing the issuer's internals that a third party cannot see. A finding
 should be stated as that disjunction rather than picking a branch. "The data moved" stops being a
-defence and becomes an admission of the second branch. Time-varying data is not excluded; *hidden* time-varying data is. Lift the rate into
+defence and becomes an admission of the second branch.
+
+There is a **third** branch, and it belongs to the verifier: its own canonicalization may be wrong. JCS
+is exactly where that happens quietly — number formatting, non-ASCII escaping, surrogate-pair key
+ordering — and such a verifier publishes accusations against clean artifacts that look identical to the
+other two from outside. That is not a clause in the finding (a finding that hedged "or our arithmetic
+may be broken" would be unusable); it is excluded *before* a finding may be stated. **Spec §8.1: a party
+MUST NOT state a re-derivation failure unless its own canonicalizer passes the L1 vectors, the
+independent-implementation JCS gate, and the vectors of the rule set it is checking.** It may report
+that it was unable to verify — a claim about itself, not about the issuer, and the two MUST NOT be
+conflated. All of it runs offline, so the precondition costs one test run rather than a relationship
+with the party being audited. Time-varying data is not excluded; *hidden* time-varying data is. Lift the rate into
 `inputs` or into the `dataVintage` axis and it is conformant again. Spec §2.1.2.
 
 Both of the above came from @seancrecord (scvd.store conformance desk) reviewing this spec for a
