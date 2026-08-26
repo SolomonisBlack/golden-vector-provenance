@@ -1,0 +1,292 @@
+{
+  "note": "Fit vectors for response-hash-check (GVP §8.1). Canonical forms and digests come from the GVP reference implementation; the check reproduces them with its own independent canonicalizer.",
+  "source": "https://github.com/SolomonisBlack/golden-vector-provenance",
+  "fit": {
+    "canonicalization": [
+      {
+        "name": "key-order-ascii",
+        "value": {
+          "b": 1,
+          "a": 2,
+          "C": 3
+        },
+        "canonical": "{\"C\":3,\"a\":2,\"b\":1}"
+      },
+      {
+        "name": "key-order-non-ascii",
+        "value": {
+          "é": 1,
+          "a": 2,
+          "Z": 3
+        },
+        "canonical": "{\"Z\":3,\"a\":2,\"é\":1}"
+      },
+      {
+        "name": "key-order-shared-prefix",
+        "value": {
+          "ab": 1,
+          "a": 2,
+          "abc": 3
+        },
+        "canonical": "{\"a\":2,\"ab\":1,\"abc\":3}"
+      },
+      {
+        "name": "non-ascii-raw-utf8",
+        "value": {
+          "s": "café — naïve 日本語"
+        },
+        "canonical": "{\"s\":\"café — naïve 日本語\"}"
+      },
+      {
+        "name": "emoji-surrogate-pair",
+        "value": {
+          "s": "👍🏽 ok"
+        },
+        "canonical": "{\"s\":\"👍🏽 ok\"}"
+      },
+      {
+        "name": "control-chars",
+        "value": {
+          "s": "a\u0000b\u001fc\nd\te"
+        },
+        "canonical": "{\"s\":\"a\\u0000b\\u001fc\\nd\\te\"}"
+      },
+      {
+        "name": "unescaped-solidus",
+        "value": {
+          "s": "a/b"
+        },
+        "canonical": "{\"s\":\"a/b\"}"
+      },
+      {
+        "name": "negative-zero",
+        "value": {
+          "n": 0
+        },
+        "canonical": "{\"n\":0}"
+      },
+      {
+        "name": "integral-float",
+        "value": {
+          "n": 1500
+        },
+        "canonical": "{\"n\":1500}"
+      },
+      {
+        "name": "number-edges",
+        "value": {
+          "a": 0.00001,
+          "b": 1000000000000000,
+          "c": 10000000000000000,
+          "d": 1e+21,
+          "e": 5e-324
+        },
+        "canonical": "{\"a\":0.00001,\"b\":1000000000000000,\"c\":10000000000000000,\"d\":1e+21,\"e\":5e-324}"
+      },
+      {
+        "name": "safe-integer-bounds",
+        "value": {
+          "a": 9007199254740991,
+          "b": -9007199254740991
+        },
+        "canonical": "{\"a\":9007199254740991,\"b\":-9007199254740991}"
+      },
+      {
+        "name": "empty-containers",
+        "value": {
+          "o": {},
+          "a": [],
+          "s": ""
+        },
+        "canonical": "{\"a\":[],\"o\":{},\"s\":\"\"}"
+      },
+      {
+        "name": "nested-arrays",
+        "value": {
+          "a": [
+            [
+              1,
+              [
+                2,
+                [
+                  3
+                ]
+              ]
+            ],
+            {
+              "b": [
+                4
+              ]
+            }
+          ]
+        },
+        "canonical": "{\"a\":[[1,[2,[3]]],{\"b\":[4]}]}"
+      }
+    ],
+    "digests": [
+      {
+        "name": "se-tax-realistic",
+        "fixedPoint": {
+          "endpoint": "/v1/self-employment-tax",
+          "inputs": {
+            "netProfit": 80000,
+            "filingStatus": "single",
+            "w2SocialSecurityWages": 0
+          },
+          "result": {
+            "netEarningsFromSelfEmployment": 73880,
+            "socialSecurityPortion": 9161.12,
+            "medicarePortion": 2142.52,
+            "additionalMedicare": 0,
+            "selfEmploymentTax": 11303.64,
+            "deductibleHalf": 5651.82
+          },
+          "method": "Schedule SE: net earnings = profit x 0.9235; SS 12.4% to wage base; Medicare 2.9%",
+          "dataVintage": "2026.0"
+        },
+        "expectedHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771"
+      },
+      {
+        "name": "paycheck-state-string",
+        "fixedPoint": {
+          "endpoint": "/v1/paycheck",
+          "inputs": {
+            "salary": 150000,
+            "state": "CA",
+            "filingStatus": "single",
+            "payFrequency": "biweekly"
+          },
+          "result": {
+            "stateName": "California",
+            "federalTax": 24734,
+            "stateTax": 10388.64,
+            "netAnnual": 103402.36
+          },
+          "method": "2026 brackets; state marginal ladder applied to gross",
+          "dataVintage": "2026.0"
+        },
+        "expectedHash": "sha256:5e46f391c0a085456dda884f5499bd1c7da07b47e6cf915d37ddd2ee677d62b5"
+      },
+      {
+        "name": "integral-floats-and-negatives",
+        "fixedPoint": {
+          "endpoint": "/v1/edge",
+          "inputs": {},
+          "result": {
+            "a": 0,
+            "b": 1500,
+            "c": 1500,
+            "d": 92350,
+            "e": -12.3,
+            "f": 0.05525,
+            "g": true,
+            "h": false,
+            "i": null
+          },
+          "method": "edge numbers",
+          "dataVintage": "2026.0"
+        },
+        "expectedHash": "sha256:1750490594dfed04fd260e2f40032d432abec31fd984de7328e5aeeaabe8c335"
+      },
+      {
+        "name": "non-ascii-utf8-raw",
+        "fixedPoint": {
+          "endpoint": "/v1/unicode",
+          "inputs": {
+            "note": "café — 50% × rate, naïve"
+          },
+          "result": {
+            "label": "Björk €12,50 — 日本語"
+          },
+          "method": "unicode passthrough",
+          "dataVintage": "2026.0"
+        },
+        "expectedHash": "sha256:39831d81ff4f5cd588d1c80d56189d8355ffb30d0558cbcce6d42e8e22ca8fe6"
+      },
+      {
+        "name": "control-char-escaping",
+        "fixedPoint": {
+          "endpoint": "/v1/escape",
+          "inputs": {
+            "s": "tab\there\nnewline \"quote\" back\\slash"
+          },
+          "result": {},
+          "method": "escape rules",
+          "dataVintage": "2026.0"
+        },
+        "expectedHash": "sha256:e8d1da5f2992ca790dcddfb1583cbb45c8411a82574c0ffc1de1191b8bffea02"
+      },
+      {
+        "name": "nested-arrays-of-objects",
+        "fixedPoint": {
+          "endpoint": "/v1/reports/relocation-paycheck",
+          "inputs": {
+            "salary": 85000
+          },
+          "result": {
+            "jurisdictions": 3,
+            "ranked": [
+              {
+                "rank": 1,
+                "state": "TX",
+                "netAnnual": 68627.5
+              },
+              {
+                "rank": 2,
+                "state": "FL",
+                "netAnnual": 68627.5
+              },
+              {
+                "rank": 3,
+                "state": "CA",
+                "netAnnual": 60123.1
+              }
+            ]
+          },
+          "method": "rank by net annual",
+          "dataVintage": "2026.0"
+        },
+        "expectedHash": "sha256:762f0e8c418542cc50fade035e0ca8a1c859ca9f17f7f4abbaac829c6e97dfb2"
+      },
+      {
+        "name": "empty-containers-and-key-order",
+        "fixedPoint": {
+          "endpoint": "/v1/empty",
+          "zzz": 1,
+          "aaa": 2,
+          "inputs": {
+            "obj": {},
+            "arr": []
+          },
+          "result": {},
+          "method": "m",
+          "dataVintage": "2026.0"
+        },
+        "expectedHash": "sha256:98b6a3467b4b5ce949fb361258261e316a3fa7d4d68c52f22b4aaec4f711a410"
+      },
+      {
+        "name": "ecma-number-edge-cases",
+        "fixedPoint": {
+          "endpoint": "/v1/ecma",
+          "inputs": {},
+          "result": {
+            "tiny": 0.00001,
+            "micro": 0.000001,
+            "e7": 1e-7,
+            "big15": 1000000000000000,
+            "big15b": 1500000000000000,
+            "e16": 10000000000000000,
+            "e21": 1e+21,
+            "frac": 0.30000000000000004,
+            "neg": -12.3,
+            "sub": 5e-324,
+            "whole": 200000
+          },
+          "method": "ecma number formatting",
+          "dataVintage": "2026.0"
+        },
+        "expectedHash": "sha256:507c0f5fd558518ff1724d519478db210bea67476b0161221448fa829d906f43"
+      }
+    ]
+  }
+}
