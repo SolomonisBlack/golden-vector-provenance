@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.7.0 — 2026-08-26
+**Four normative rules, all from external conformance review, all backwards-compatible (`GVP-FixedPoint/1`
+is frozen and every existing hash is byte-identical).** These accumulated on `main` above published npm
+0.6.0 and are released together here.
+
+- **`GVP-FixedPoint/2` pins `dataVintage`** (spec §2.1.3). `/1` typed it as an unconstrained `<string>`,
+  so `"July 2026"`, `"2026-07"`, `"2026.0"` all hashed differently for identical data — a divergence that
+  had already fired between this repo's own vectors and its reference service. `/2` requires ISO 8601
+  reduced precision (`YYYY | YYYY-MM | YYYY-MM-DD`), precision significant, lexical order = chronological.
+  Vectors `vectors/expected-v2.json`, gate `tools/check-fixedpoint-2.mjs`. Raised by @seancrecord (scvd.store).
+- **`dataVintage` completeness** (spec §2.1.3). It MUST characterise **all** sources that contributed to
+  `result`, MUST be the **oldest** where they differ, and a seller who cannot enumerate them MUST NOT emit
+  a `responseHash` — which is §2.1.2 restated (an un-enumerable source is a hidden input). Raised by
+  @kopko13 (Sirenic) from a live multi-source catalogue.
+- **§2.1.2 closure rule** (normative). An issuer MUST NOT emit a `responseHash` when `result` depends on
+  anything outside the fixed point. A failed re-derivation is therefore a disjunction — altered artifact
+  OR a hash issued in violation — and a verifier need not (cannot) attribute between them for the finding
+  to stand. Raised by @seancrecord; the first draft's "only remaining explanation" was itself wrong (a
+  MUST NOT does not prevent its own violation) and was corrected in the same review.
+- **§8.1 verifier precondition** (normative — the spec's first constraint on verifiers rather than
+  issuers). A party MUST NOT state a re-derivation failure unless its own canonicalizer passes the L1
+  vectors, the independent-implementation JCS gate, and the rule set's vectors. `npm run verifier-precondition`.
+
+**Also:** `interop/scvd/` — a working conformance check offered to the scvd.store desk (independent
+canonicalizer, 31/0, offline). **Licensing made machine-classifiable** — `LICENSE` is now the verbatim
+Apache-2.0 text (the repo previously reported `NOASSERTION` because `LICENSE` was a pointer document);
+the dual-licence split moved to `LICENSING.md`; the spec's CC-BY-4.0 grant is unchanged.
+
+> **npm note:** npm `golden-vector-provenance@0.6.0` (published 2026-08-23) predates all of the above and
+> does **not** contain it. This git tag `v0.7.0` is the accurate snapshot. Publishing npm 0.7.0 to match
+> is an owner-gated follow-up; until then, pin the git tag, not the npm 0.6.0 package, for these rules.
+
 ## 0.6.0 — 2026-08-23
 **`fixedPointVersion` is now bound — inside the signed L2 payload.** Round 3 of external review on
 x402-foundation/x402#3234 demonstrated against 0.5.0 that the field, emitted beside the hash but
