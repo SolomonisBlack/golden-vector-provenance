@@ -189,7 +189,30 @@ moving to `/2` re-hashes its artifacts under the new rule set and declares
 `fixedPointVersion: "GVP-FixedPoint/2"`; because that identifier is inside the signed payload at L2
 (§6), the migration is detectable rather than silent — which is the entire reason the identifier exists.
 
-*Rationale: raised by @seancrecord (scvd.store conformance desk, 2026-08-24).*
+**Completeness: `dataVintage` covers EVERY source that contributed to `result`, or the hash is not
+emitted.** Format alone is not enough. A single scalar over a `result` assembled from several sources is
+not a vintage — it is the vintage of whichever source the implementer happened to think of, and it reads
+as complete to a buyer who cannot see the others. So, normatively, under `GVP-FixedPoint/2`:
+
+- `dataVintage` MUST characterise **all** sources that contributed to `result`, not the freshest, not
+  the most prominent, and not the one most convenient to state.
+- Where contributing sources carry different vintages, the value MUST be the **oldest** of them. The
+  weakest link is the honest claim; naming the newest asserts a currency the answer does not have.
+- **A seller who cannot enumerate the sources that contributed to `result` MUST NOT emit a
+  `responseHash` at all.** Note this is not a new prohibition — it is §2.1.2 restated. A source you
+  cannot enumerate is an input the verifier cannot see, which is precisely a hidden input, and the
+  closure rule already forbids issuing over one. Approximating the vintage instead would produce a
+  well-formed hash over a quietly false claim, which is worse than no hash.
+
+The precision grammar above interacts with this deliberately. A multi-source answer whose oldest
+contributor is only known to the month declares `"2026-07"`, not `"2026-07-01"` — the coarse value is
+the accurate one, and the spec must not reward padding it out to look precise.
+
+*Rationale: raised by @seancrecord (scvd.store conformance desk, 2026-08-24). The completeness rule was
+raised separately by @kopko13 of Sirenic (sirenic-eu/sirenic-examples#2, 2026-08-26), from a live
+catalogue whose comparison routes combine a live registry, a monthly bulk stock, a court-filings feed and
+a deliberately frozen source — and from having been bitten before by a freshness field that named three
+of four contributing sources and therefore read as complete.*
 
 ### 2.2 Canonical JSON (byte-level; this is the interop boundary)
 Two implementations interoperate only if they produce **identical bytes** before hashing.
