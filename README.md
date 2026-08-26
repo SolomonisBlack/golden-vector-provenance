@@ -242,6 +242,14 @@ evidence about *canonicalization*, not about their signing path, which refuses f
 design — the region our vectors live in. It is also not adoption: GVP still has no external
 implementers, and an independent verification is not the same claim.
 
+## Licensing
+
+`LICENSE` is the verbatim **Apache-2.0** text, so automated scanners classify this repository
+correctly. The project is dual-licensed and always has been — **reference code (`ref/`, `tools/`,
+`schema/`, `middleware/`) Apache-2.0; the specification (`spec/`, this README) CC-BY-4.0** — with the
+verbatim texts in `LICENSE-APACHE-2.0` and `LICENSE-CC-BY-4.0` and the split explained in
+[`LICENSING.md`](LICENSING.md). Implementing GVP requires no permission and no notification.
+
 ## The test key is a test key
 
 `vectors/attestation-key.json` contains a **fixed throwaway private key**, published deliberately so
