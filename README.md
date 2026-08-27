@@ -239,8 +239,9 @@ Two properties make it evidence rather than a mirror, both their choices, not ou
 
 **What it does not cover**, stated in their README and repeated here rather than buried: this is
 evidence about *canonicalization*, not about their signing path, which refuses fractional numbers by
-design — the region our vectors live in. It is also not adoption: GVP still has no external
-implementers, and an independent verification is not the same claim.
+design — the region our vectors live in. Note the distinction this repo keeps: an independent
+verification is not the same claim as adoption. (For the production adoption that now does exist, see
+**Status and governance** below.)
 
 ## Licensing
 
@@ -277,22 +278,42 @@ LICENSE                       Apache-2.0 (code) / CC-BY-4.0 (spec) — full text
 
 ## Status and governance
 
-GVP v0.2 is a **draft, authored and maintained by its original implementer.** It is not ratified by
-any standards body, and at the time of writing it has **no external adopters.**
+GVP v0.2 is a **draft specification, authored and maintained by its original author.** It is not
+ratified by any standards body. It is **single-author as a specification** — nobody else has co-authored
+the spec text.
 
-One deployment computes GVP hashes today: the [x402toll.com](https://x402toll.com) service, by the same
-author. Its canonicalization is byte-identical to this reference (verified above), so the hashes agree.
-But note the two are **not yet aligned in wording**: the informal description that service serves at
-`/v1/spec` predates this document — it does not name RFC 8785, uses the tier names
-`GVP-Core/Verify/Receipt` rather than `L1/L2/L3`, and states a different licence. **This repository is
-the formal specification and supersedes that description where they differ**; the served spec is
-expected to be realigned to it. Treat this document, not the deployed `/v1/spec`, as authoritative.
+**It is no longer without external implementation.** As of 2026-08-27:
 
-It is published in the hope that the L1 idea is useful enough to be carried by standards that do have
-adoption.
+- **First external production implementation.** The [SCVD conformance desk](https://scvd.store)
+  ([source](https://github.com/seancrecord/scvd-general-store-repo)) — an independent evidence
+  observatory for agentic commerce, which competes with the issuers it audits — **merged a GVP
+  `responseHash` re-derivation check into its production `/api/conformance/v1` surface**
+  ([PR #270](https://github.com/seancrecord/scvd-general-store-repo/pull/270)). The check runs on their
+  own independent RFC 8785 implementation, and their §8.1 gate confirms it reproduces every published
+  GVP vector — two canonicalizers, written independently by parties with reason to disagree, producing
+  identical bytes.
+- **A defect class sourced from the work.** `nonce-unbound-from-settlement` is registered in that desk's
+  public [defect vocabulary](https://scvd.store/defects), *sourced by* this project and *registered by*
+  them — the first outside-sourced class in their register.
+- **Three independent cross-checks** reproduced the published vectors with their own code:
+  [whawk46/x402-jcs-crosscheck](https://github.com/whawk46/x402-jcs-crosscheck) (24/24, vectors pinned
+  not vendored), [giskard09/argentum-core](https://github.com/giskard09/argentum-core) (7 preimages,
+  **one anchored on Base mainnet** at block 49623528, immutable before it was checked), and the SCVD
+  desk (§8.1, above).
+
+The reference deployment [x402toll.com](https://x402toll.com) computes GVP hashes under this rule set;
+its canonicalization is byte-identical to this reference (verified above). Its served `/v1/spec`
+description predates this document and is expected to be realigned to it — **this repository is the
+authoritative specification** where they differ.
+
+**Honest boundary, kept in every artifact:** reproduction is not co-authorship, and one production
+verifier is not a ratified standard. What is true is that the single thing this most needed — an
+external implementation — now exists, in production, by a party with no incentive to flatter it. The
+open proposal to carry `responseHash` inside the x402 signed receipt is at
+[x402-foundation/x402#3234](https://github.com/x402-foundation/x402/issues/3234).
 
 If you implement it, or want a field like `responseHash` in a receipt format you maintain, please open
-an issue — an external implementer is the single thing this most needs.
+an issue.
 
 ## Implementation checklist ("a stranger can implement it from the repo alone")
 - [x] Canonicalization + hash (L1), JS + Python references, byte-agreement proven.
