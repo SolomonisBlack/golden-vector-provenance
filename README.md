@@ -152,6 +152,20 @@ GVP uses the same primitives, and why its hash drops into any of them.
 | Microsoft agent-governance-toolkit receipts | policy hashes, pre/post-execution signatures | No — attests policy/execution, not answer re-derivation |
 | **GVP L1** | `endpoint`, `inputs`, `result`, `method`, `dataVintage` | **Yes**, + free re-derivation |
 
+**Rail-agnostic by construction.** The fixed point binds the question and the answer, and says
+nothing about how — or whether — payment settled. x402 receipts are the first carrier, but an AP2
+mandate, an ACP order, a card-network token receipt, or a response nobody paid for can carry the same
+`responseHash` member unchanged. If the agent-payments rails consolidate differently than today's
+map suggests, the provenance layer doesn't move.
+
+Two companion notes locate GVP in the wider stack:
+- [`docs/RECOMPUTE-NOT-TRUST.md`](docs/RECOMPUTE-NOT-TRUST.md) — the five trust models for
+  machine-produced answers (signatures, TEE, staking, zkML, recompute), what each proves, and the
+  honest boundary of the recompute class GVP belongs to.
+- [`docs/REGULATORY-BRIDGE.md`](docs/REGULATORY-BRIDGE.md) — how GVP artifacts map to the evidence
+  classes named by the EU AI Act, ISO/IEC 42001, NIST AI RMF, and (reportedly) AI insurance
+  underwriting. Not legal advice, and it says so.
+
 ## Canonicalization
 
 Canonical JSON in GVP **is RFC 8785 (JCS)**. GVP defines no bespoke serialization; RFC 8785 governs.
@@ -273,6 +287,8 @@ tools/check-js.mjs            JS conformance check (L1 + L2)
 tools/check-jcs.mjs           RFC 8785 equivalence gate (vs an independent implementation)
 tools/gen-vectors.mjs         generate L1 hashes (optional GVP_CALC_CORE cross-check vs a 2nd impl)
 tools/gen-attestation.mjs     generate L2 attestation vectors with the fixed test key
+docs/RECOMPUTE-NOT-TRUST.md   category note: the five trust models and where GVP sits
+docs/REGULATORY-BRIDGE.md     GVP artifacts mapped to EU AI Act / ISO 42001 / NIST AI RMF evidence classes
 LICENSE                       Apache-2.0 (code) / CC-BY-4.0 (spec) — full texts included
 ```
 
