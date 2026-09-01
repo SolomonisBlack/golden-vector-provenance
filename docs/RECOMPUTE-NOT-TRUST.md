@@ -68,7 +68,7 @@ As of late August 2026 no analyst firm sizes "recompute-based response verificat
 market; the nearest category (AI TRiSM) is estimated around $3.0–3.5B for 2026
 ([MarketsAndMarkets](https://www.marketsandmarkets.com/Market-Reports/ai-trust-risk-security-management-trism-market-8112669.html)).
 Funded recompute-class projects exist at the logit and SQL layers; at the response layer, GVP's
-implementations (four independent reproductions, one production conformance desk — see the README's
+implementations (four independent reproductions, one conformance desk with the check merged to its production main — see the README's
 Status section for the evidenced list) are, to our knowledge, the extent of the field. That is a
 statement about how early this is, not how large. Both readings are available; we hold the first and
 are building for the second.

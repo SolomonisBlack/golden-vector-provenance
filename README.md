@@ -254,7 +254,7 @@ Two properties make it evidence rather than a mirror, both their choices, not ou
 **What it does not cover**, stated in their README and repeated here rather than buried: this is
 evidence about *canonicalization*, not about their signing path, which refuses fractional numbers by
 design — the region our vectors live in. Note the distinction this repo keeps: an independent
-verification is not the same claim as adoption. (For the production adoption that now does exist, see
+verification is not the same claim as adoption. (For the merged external adoption, see
 **Status and governance** below.)
 
 ## Licensing
@@ -300,14 +300,22 @@ the spec text.
 
 **It is no longer without external implementation.** As of 2026-08-27:
 
-- **First external production implementation.** The [SCVD conformance desk](https://scvd.store)
+- **First external implementation, merged to their production main.** The
+  [SCVD conformance desk](https://scvd.store)
   ([source](https://github.com/seancrecord/scvd-general-store-repo)) — an independent evidence
   observatory for agentic commerce, which competes with the issuers it audits — **merged a GVP
-  `responseHash` re-derivation check into its production `/api/conformance/v1` surface**
-  ([PR #270](https://github.com/seancrecord/scvd-general-store-repo/pull/270)). The check runs on their
+  `responseHash` re-derivation check** into the main branch behind its `/api/conformance/v1` surface
+  ([PR #270](https://github.com/seancrecord/scvd-general-store-repo/pull/270),
+  [#274](https://github.com/seancrecord/scvd-general-store-repo/pull/274)). The check runs on their
   own independent RFC 8785 implementation, and their §8.1 gate confirms it reproduces every published
   GVP vector — two canonicalizers, written independently by parties with reason to disagree, producing
-  identical bytes.
+  identical bytes. Their maintainer states the check runs in production
+  ([x402#3234, 2026-08-30](https://github.com/x402-foundation/x402/issues/3234)).
+  **Observability note (checked 2026-08-31):** the deployed public API doc does not yet expose the
+  provenance block, so "running in production" is their statement, not independently observable from
+  outside; the independently observable public credit is the defect-vocabulary entry below. This
+  distinction is kept here on purpose — the repo's standard for its own claims is the standard it
+  asks of everyone else's.
 - **A defect class sourced from the work.** `nonce-unbound-from-settlement` is registered in that desk's
   public [defect vocabulary](https://scvd.store/defects), *sourced by* this project and *registered by*
   them — the first outside-sourced class in their register.
@@ -322,9 +330,11 @@ its canonicalization is byte-identical to this reference (verified above). Its s
 description predates this document and is expected to be realigned to it — **this repository is the
 authoritative specification** where they differ.
 
-**Honest boundary, kept in every artifact:** reproduction is not co-authorship, and one production
-verifier is not a ratified standard. What is true is that the single thing this most needed — an
-external implementation — now exists, in production, by a party with no incentive to flatter it. The
+**Honest boundary, kept in every artifact:** reproduction is not co-authorship, one merged check is
+not a ratified standard, and a maintainer's statement of production use is not independent
+observability (see the note above). What is true and checkable is that the single thing this most
+needed — an external implementation, written and merged by a party with no incentive to flatter it —
+now exists on their production main. The
 open proposal to carry `responseHash` inside the x402 signed receipt is at
 [x402-foundation/x402#3234](https://github.com/x402-foundation/x402/issues/3234).
 
