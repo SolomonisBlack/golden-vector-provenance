@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased (on `main` above 0.7.0)
+No normative change; no hash changes. Docs and an example only — nothing here needs an npm release.
+
+- **`examples/plain-http/`** — an issuer and a requester-side verifier on Node's built-in `http` with
+  no payment protocol imported anywhere: the rail-agnostic claim made executable. Reproduces the
+  middleware vector (`sha256:7236fd58…`) and exercises all four verification outcomes; wired into
+  `npm test` as `check:plain-http`. Follows the 0.7.0 envelope (`method`/`dataVintage` top-level);
+  will move to the x402#3304 carriage when that text settles.
+- **`docs/COMPLIANCE-MEMO-ART50-ART12.md`** — one page for audit/compliance vendors: EU AI Act
+  Art. 50(2) (complements synthetic-content marking, does not satisfy it alone; 2 Aug 2026 in force,
+  Omnibus window to 2 Dec 2026 for systems already on the market) and Art. 12 (the direct fit).
+
 ## 0.7.0 — 2026-08-26
 **Four normative rules, all from external conformance review, all backwards-compatible (`GVP-FixedPoint/1`
 is frozen and every existing hash is byte-identical).** These accumulated on `main` above published npm

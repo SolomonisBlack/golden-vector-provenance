@@ -156,7 +156,10 @@ GVP uses the same primitives, and why its hash drops into any of them.
 nothing about how — or whether — payment settled. x402 receipts are the first carrier, but an AP2
 mandate, an ACP order, a card-network token receipt, or a response nobody paid for can carry the same
 `responseHash` member unchanged. If the agent-payments rails consolidate differently than today's
-map suggests, the provenance layer doesn't move.
+map suggests, the provenance layer doesn't move. That claim is executable, not rhetorical:
+[`examples/plain-http/`](examples/plain-http/) is an issuer and a verifier on Node's built-in `http`
+with no payment protocol anywhere in the directory, reproducing a published vector and all four
+verification outcomes (`npm run check:plain-http`, part of `npm test`).
 
 Two companion notes locate GVP in the wider stack:
 - [`docs/RECOMPUTE-NOT-TRUST.md`](docs/RECOMPUTE-NOT-TRUST.md) — the five trust models for
@@ -165,6 +168,10 @@ Two companion notes locate GVP in the wider stack:
 - [`docs/REGULATORY-BRIDGE.md`](docs/REGULATORY-BRIDGE.md) — how GVP artifacts map to the evidence
   classes named by the EU AI Act, ISO/IEC 42001, NIST AI RMF, and (reportedly) AI insurance
   underwriting. Not legal advice, and it says so.
+- [`docs/COMPLIANCE-MEMO-ART50-ART12.md`](docs/COMPLIANCE-MEMO-ART50-ART12.md) — the one-page
+  version for audit and compliance vendors: what a receipt gives you under EU AI Act Article 50(2)
+  (complements synthetic-content marking; does not satisfy it alone) and Article 12 (the direct
+  fit: a re-derivable record instead of a log line), with the dates and the boundary stated.
 
 ## Canonicalization
 
@@ -289,6 +296,8 @@ tools/gen-vectors.mjs         generate L1 hashes (optional GVP_CALC_CORE cross-c
 tools/gen-attestation.mjs     generate L2 attestation vectors with the fixed test key
 docs/RECOMPUTE-NOT-TRUST.md   category note: the five trust models and where GVP sits
 docs/REGULATORY-BRIDGE.md     GVP artifacts mapped to EU AI Act / ISO 42001 / NIST AI RMF evidence classes
+docs/COMPLIANCE-MEMO-ART50-ART12.md  one-page memo for audit/compliance vendors: Art. 50(2) + Art. 12 fit and boundary
+examples/plain-http/          issuer + verifier on node:http with no payment rail — the rail-agnostic claim, executable
 LICENSE                       Apache-2.0 (code) / CC-BY-4.0 (spec) — full texts included
 ```
 
