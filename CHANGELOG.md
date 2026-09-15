@@ -8,6 +8,12 @@ No normative change; no hash changes. Docs and an example only — nothing here 
   middleware vector (`sha256:7236fd58…`) and exercises all four verification outcomes; wired into
   `npm test` as `check:plain-http`. Follows the 0.7.0 envelope (`method`/`dataVintage` top-level);
   will move to the x402#3304 carriage when that text settles.
+- **README correction** (2026-09-15, at giskard09's request) — the "three independent cross-checks"
+  line had credited giskard09/argentum-core with "7 preimages, one anchored on Base mainnet"; that
+  conflated their 2026-08-24 canonicalization cross-check over 14 of their own `action_ref` preimages
+  with a separate repository's anchor that was a proposed shape, never built. The line now cites
+  their 2026-09-15 review on x402#3304 (normative worked vector reconstructed and hashed with a
+  third-party RFC 8785 library, byte-exact; two fresh preimages) and keeps the correction visible.
 - **`docs/CARRIAGE-PROFILES.md`** (2026-09-15) — names the three carriages a `responseHash` travels
   in: C1 the x402 `extensions["response-provenance"]` envelope (middleware, #3304), C2 the original
   `provenance` block x402toll.com still emits, C3 a `response_provenance` extension field for signed

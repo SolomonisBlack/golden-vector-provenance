@@ -83,8 +83,11 @@ correctness is another claim.
 - One external production implementation: the SCVD conformance desk merged a `responseHash`
   re-derivation check on 2026-08-27 on its own RFC 8785 implementation
   ([PR #270](https://github.com/seancrecord/scvd-general-store-repo/pull/270)).
-- Three independent parties reproduced the vectors byte-for-byte
-  ([one is public](https://github.com/whawk46/x402-jcs-crosscheck)). Reproduction is not adoption.
+- Three independent parties reproduced published vectors byte-for-byte with their own code:
+  [whawk46/x402-jcs-crosscheck](https://github.com/whawk46/x402-jcs-crosscheck) (24/24), the SCVD
+  desk's own canonicalizer (its self-proof gate), and giskard09's 2026-09-15 reconstruction of the
+  x402 extension's normative worked vector with a third-party RFC 8785 library (review on
+  [#3304](https://github.com/x402-foundation/x402/pull/3304)). Reproduction is not adoption.
 - A PR carrying the field as an x402 extension is open at
   [x402-foundation/x402#3304](https://github.com/x402-foundation/x402/pull/3304): one reviewer
   approval, waiting on a maintainer, not merged.

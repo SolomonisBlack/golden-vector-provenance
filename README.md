@@ -339,9 +339,16 @@ the spec text.
   them — the first outside-sourced class in their register.
 - **Three independent cross-checks** reproduced the published vectors with their own code:
   [whawk46/x402-jcs-crosscheck](https://github.com/whawk46/x402-jcs-crosscheck) (24/24, vectors pinned
-  not vendored), [giskard09/argentum-core](https://github.com/giskard09/argentum-core) (7 preimages,
-  **one anchored on Base mainnet** at block 49623528, immutable before it was checked), and the SCVD
-  desk (§8.1, above).
+  not vendored); the SCVD desk (§8.1, above); and giskard09, who on 2026-09-15 reconstructed the
+  normative worked vector of the x402 extension text by hand, hashed it with a third-party RFC 8785
+  library to a byte-exact match, and hashed two fresh preimages end to end (review on
+  [x402-foundation/x402#3304](https://github.com/x402-foundation/x402/pull/3304)).
+  *Correction 2026-09-15, at giskard09's request:* an earlier version of this line credited
+  giskard09/argentum-core with "7 preimages, one anchored on Base mainnet at block 49623528". That
+  conflated their 2026-08-24 run of this canonicalizer over 14 of *their own* `action_ref` preimages
+  (canonicalization agreement, not a check of this fixed point) with a separate repository's anchored
+  manifest that was offered as a shape for a `responseHash` leg and never built. Neither was a
+  verification of GVP's vectors; the line above describes what was.
 
 The reference deployment [x402toll.com](https://x402toll.com) computes GVP hashes under this rule set;
 its canonicalization is byte-identical to this reference (verified above). Its served `/v1/spec`

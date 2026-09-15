@@ -36,7 +36,9 @@ x402 responses.
 x402toll.com has emitted this carriage since before C1 existed and still does on all 59 endpoints
 (the source is `calc-core/src/provenance.js`, `buildResponse`). Same fixed point, same hash. A verifier
 that reads only C1 will not find the hash on a C2 response; a verifier that reads both finds the same
-value. Free re-derivation for C2 responses: `POST /v1/verify-hash`.
+value. Free re-derivation for C2 responses: `POST /v1/verify-hash`. The SCVD conformance desk reads this
+carriage (`provenance.responseHash`; a body without it is `applies: false`, per their 2026-09-15 review on
+[x402-foundation/x402#3304](https://github.com/x402-foundation/x402/pull/3304)).
 
 ## C3. Compliance-receipt extension field (`response_provenance`)
 
