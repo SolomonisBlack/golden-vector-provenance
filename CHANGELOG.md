@@ -8,6 +8,14 @@ No normative change; no hash changes. Docs and an example only — nothing here 
   middleware vector (`sha256:7236fd58…`) and exercises all four verification outcomes; wired into
   `npm test` as `check:plain-http`. Follows the 0.7.0 envelope (`method`/`dataVintage` top-level);
   will move to the x402#3304 carriage when that text settles.
+- **`docs/CARRIAGE-PROFILES.md`** (2026-09-15) — names the three carriages a `responseHash` travels
+  in: C1 the x402 `extensions["response-provenance"]` envelope (middleware, #3304), C2 the original
+  `provenance` block x402toll.com still emits, C3 a `response_provenance` extension field for signed
+  compliance-receipt profiles (scope signed-payload; vocabulary stated so an independent verifier can
+  validate it). Same bytes under every carriage; the carriage is never inside the hashed object.
+- **`docs/MEASURED-NOT-CLAIMED.md`** (2026-09-15) — explainer: the x402.org counter episode
+  (McGlynn 2026-09-06; Visa/Artemis July 2026 filtering 89% of dollar volume), the USENIX Security
+  2026 x402 attack paper, and what a re-derivable hash does and does not prove. Dated sources inline.
 - **`docs/COMPLIANCE-MEMO-ART50-ART12.md`** — one page for audit/compliance vendors: EU AI Act
   Art. 50(2) (complements synthetic-content marking, does not satisfy it alone; 2 Aug 2026 in force,
   Omnibus window to 2 Dec 2026 for systems already on the market) and Art. 12 (the direct fit).
