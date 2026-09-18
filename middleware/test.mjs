@@ -146,5 +146,33 @@ throws('honoProvenance requires a function', () => honoProvenance(123));
   eq('consumer re-derives the emitted hash', emitted.extensions[EXTENSION_KEY].responseHash, recomputed);
 }
 
+// 6. resultCarriage (x402#3304 carriage table): "body" attaches to a root-level API without wrapping
+{
+  const { recoverResult, fixedPointFromBody, RESULT_CARRIAGES } = await import('./index.mjs');
+  const WV = { endpoint: '/v1/echo-sum', inputs: { a: 2, b: 3 }, result: { sum: 5 }, method: 'sum = a + b, integer addition', dataVintage: '2026-07' };
+  const WV_HASH = 'sha256:81ea1f2227fd9df5b868954e6d26d091810352f148dade483b260844788ede03';
+  const rootBody = { sum: 5 };
+  const outBody = attachProvenance(rootBody, WV, { resultCarriage: 'body' });
+  eq('body carriage: hash equals the worked vector (same fixed point, same hash)', outBody.extensions[EXTENSION_KEY].responseHash, WV_HASH);
+  eq('body carriage: block declares resultCarriage', outBody.extensions[EXTENSION_KEY].resultCarriage, 'body');
+  eq('body carriage: answer stays at the root, no wrapper', outBody.sum, 5);
+  truthy('body carriage: no result member added', !('result' in outBody));
+  eq('member carriage (default): block omits resultCarriage', attachProvenance({ result: { sum: 5 } }, WV).extensions[EXTENSION_KEY].resultCarriage, undefined);
+  eq('block restates method and dataVintage beside the hash (carriage table)', [provenanceBlock(WV).method, provenanceBlock(WV).dataVintage], [WV.method, WV.dataVintage]);
+  eq('recoverResult("body") strips only extensions', recoverResult(outBody, 'body'), { sum: 5 });
+  eq('recoverResult("member") reads result', recoverResult({ result: { sum: 5 }, extensions: {} }, 'member'), { sum: 5 });
+  throws('recoverResult("member") without result member throws', () => recoverResult({ sum: 5 }, 'member'));
+  throws('unknown carriage rejected', () => attachProvenance(rootBody, WV, { resultCarriage: 'weird' }));
+  throws('body carriage rejects a fixed point whose result != body minus extensions (issuer cannot lie about carriage)',
+    () => attachProvenance({ sum: 6 }, WV, { resultCarriage: 'body' }));
+  eq('fixedPointFromBody builds the body-carriage fixed point', gvpHash(fixedPointFromBody({ sum: 5, extensions: { x: 1 } }, { endpoint: WV.endpoint, inputs: WV.inputs, method: WV.method, dataVintage: WV.dataVintage })), WV_HASH);
+  eq('RESULT_CARRIAGES is the closed pair', [...RESULT_CARRIAGES], ['member', 'body']);
+  // express adapter honours the option
+  const res = { json(b) { this.sent = b; }, locals: {} };
+  expressProvenance(() => WV, { resultCarriage: 'body' })({ path: WV.endpoint }, res, () => {});
+  res.json({ sum: 5 });
+  eq('express body carriage injects at the root', [res.sent.sum, res.sent.extensions[EXTENSION_KEY].resultCarriage, res.sent.extensions[EXTENSION_KEY].responseHash], [5, 'body', WV_HASH]);
+}
+
 console.log(`\nmiddleware: ${fails} failure(s)`);
 process.exit(fails ? 1 : 0);

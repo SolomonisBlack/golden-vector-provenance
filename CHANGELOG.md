@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.0 — 2026-09-18
+**Two reviewer-driven additions; no hash change.**
+
+- **`resultCarriage` in the middleware** (x402#3304 carriage table, raised by kopko13 2026-09-16,
+  confirmed by giskard09 and whawk46). `attachProvenance(body, fp, { resultCarriage: "body" })`,
+  `expressProvenance(build, { resultCarriage })`, `honoProvenance(build, { resultCarriage })`,
+  plus `recoverResult(body, carriage)` and `fixedPointFromBody(body, {...})`. Under `"body"` the answer
+  stays at the root of the response (no wrapper, no duplicate payload) and the block declares
+  `resultCarriage: "body"`; under `"member"` (default) nothing changes and the member is omitted. The
+  block now also restates `method` and `dataVintage` beside the hash, as the carriage table requires.
+  Attaching under `"body"` asserts that the fixed point's `result` equals the body minus `extensions`,
+  so an issuer cannot declare a carriage it does not satisfy. Same fixed point, same hash either way;
+  the worked vector reproduces under both.
+- **Hash-invocation-count check** (`tools/check-hash-count.mjs`, in `npm test`; shape credited to
+  goun7 / Tamga AT-034 on x402#2887, 2026-09-17). A test-only seam `hooks.beforeDigest` in
+  `ref/js/gvp.mjs` (default no-op) lets the check count digests: every refusal path (non-finite, NaN,
+  depth > 100, missing/extra/non-object member set) reaches the digest **0** times; the green path and
+  the tamper path **exactly 1**. Negative-self-tested: a flipped expected count fails the check. A
+  bullet list of refusals is a claim; this is the evidence.
+
 ## 0.8.0 — 2026-09-18
 **New tool, no normative change, no hash change.** Everything below the 0.7.0 line still holds.
 

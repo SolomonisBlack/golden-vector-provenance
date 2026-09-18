@@ -22,8 +22,17 @@ export function canonicalize(value, depth = 0) {
   return JSON.stringify(value);
 }
 
+// Instrumentation seam (test-only by default): called with the canonical bytes immediately before the
+// digest. Lets a conformance test COUNT hash invocations and assert that refusal paths (non-finite,
+// depth, bad member set) reach the digest 0 times and the green/tamper paths exactly 1 (the
+// hash-invocation-count instrument; see tools/check-hash-count.mjs). Default no-op; never set in
+// production paths. A refusal that happens after this point would be a bug this seam can catch.
+export const hooks = { beforeDigest: null };
+
 // GVP response hash (§Hashing): sha256 over the canonical JSON of the fixed point
 // {endpoint, inputs, result, method, dataVintage}. Prefixed "sha256:".
 export function gvpHash(fixedPoint) {
-  return 'sha256:' + createHash('sha256').update(canonicalize(fixedPoint), 'utf8').digest('hex');
+  const canonical = canonicalize(fixedPoint);   // every refusal throws here, before any digest
+  if (hooks.beforeDigest) hooks.beforeDigest(canonical);
+  return 'sha256:' + createHash('sha256').update(canonical, 'utf8').digest('hex');
 }

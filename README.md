@@ -65,6 +65,12 @@ import { honoProvenance } from 'golden-vector-provenance/middleware';
 app.use(honoProvenance((c, body) => ({ /* same shape */ })));
 ```
 
+**Root-level APIs (no `result` wrapper):** pass `{ resultCarriage: "body" }` as the second argument to
+`expressProvenance` / `honoProvenance` / `attachProvenance` and build the fixed point with
+`fixedPointFromBody(body, { endpoint, inputs, method, dataVintage })`. The answer stays at the root,
+the block declares `resultCarriage: "body"`, and a verifier recovers `result` as the body minus
+`extensions`. Same fixed point, same hash as the `"member"` default (the x402#3304 carriage table).
+
 Provenance never breaks serving: if `buildFixedPoint` returns falsy or throws, the response is emitted
 unchanged (Express records the error on `res.locals.gvpError`). The emitted block also lists which
 fields were hashed (`fixedPoint`) — but that list is the **spec constant**, not a self-declared description. All five members are required and the set is closed, so a seller cannot shrink the fixed point (e.g. drop `inputs`) and stay internally consistent: a verifier always recomputes over the five spec members, and `endpoint`+`inputs` being required means the hash binds the *question* as well as the answer. The block also carries `fixedPointVersion: "GVP-FixedPoint/1"` — the *name* of the frozen rule set that defined those five members, emitted beside the hash (never inside it, so no hash changes). **On a bare L1 response this field is informational and unauthenticated** — nothing signs a bare response, so it can be stripped or forged. It is **bound at L2**: under signed-payload shape `GVP-Attestation/2` it sits *inside* the Ed25519-signed payload, so stripping or forging it fails the signature (`tools/check-l2-binding.mjs` proves the four-case table). `GVP-FixedPoint/1` will never change — a different member set would be a new identifier. (All of these came out of three rounds of review on x402-foundation/x402#3234.)
