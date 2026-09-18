@@ -21,7 +21,7 @@
   "type": "module",
   "main": "./index.mjs",
   "bin": {
-    "gvp-audit": "./audit/cli.mjs"
+    "gvp-audit": "audit/cli.mjs"
   },
   "exports": {
     ".": "./index.mjs",
