@@ -1,7 +1,27 @@
 # Changelog
 
-## Unreleased (on `main` above 0.7.0)
-No normative change; no hash changes. Docs and an example only — nothing here needs an npm release.
+## 0.8.0 — 2026-09-18
+**New tool, no normative change, no hash change.** Everything below the 0.7.0 line still holds.
+
+- **`gvp-audit`** (`audit/`, bin `gvp-audit`) — the closure audit for x402 sellers. Reads served
+  response bodies (offline) or fetches free surfaces (never pays a 402) and reports, per route: hidden-input
+  signals (clock keys, datetimes, UUIDs, epochs near now, relative windows; key-based rules apply to
+  primitive values only), carriage fit (`member` vs `resultCarriage:"body"`), format violations (integers
+  beyond 2^53-1 as numbers, duplicate member names via a raw-text scanner, depth > 100), vintage
+  candidates and their `GVP-FixedPoint/2` grammar, existing provenance (C1 member/body, C2 `provenance`
+  block) re-derived with the reference hash, and drift between two samples of the same route classified
+  as clock / nonce / runtime / vintage / data. Verdict vocabulary is deliberately honest:
+  `no-closure-violation-found` (never "closure-safe"), `review-needed`, `hidden-inputs-found`,
+  `format-violation`, `out-of-scope`. `--strict` for CI. Why now: the first seller to run a real catalogue
+  against x402#3304 found three request-time-clock members on routes that were closure-safe by handler
+  code (kopko13, 2026-09-17); this finds that class before a buyer does. 82-check suite in
+  `audit/test.mjs` (unit + CLI end-to-end on generated fixtures); live-run against x402toll.com free
+  surfaces caught and fixed two false-positive classes (schema property objects under keys like `date`,
+  prose descriptions) before release. Output is ASCII-only so Windows consoles render it.
+- Docs from the Unreleased section below are now released with this version.
+
+## Unreleased-then-released with 0.8.0 (docs only, on `main` above 0.7.0)
+No normative change; no hash changes.
 
 - **`examples/plain-http/`** — an issuer and a requester-side verifier on Node's built-in `http` with
   no payment protocol imported anywhere: the rail-agnostic claim made executable. Reproduces the

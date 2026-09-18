@@ -1,6 +1,6 @@
 {
   "name": "golden-vector-provenance",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Reproducible provenance for computed answers: a canonical SHA-256 fixed point (RFC 8785 JCS) that anyone can re-derive for free, so you recompute the answer instead of trusting the server.",
   "keywords": [
     "provenance",
@@ -20,6 +20,9 @@
   ],
   "type": "module",
   "main": "./index.mjs",
+  "bin": {
+    "gvp-audit": "./audit/cli.mjs"
+  },
   "exports": {
     ".": "./index.mjs",
     "./gvp": "./ref/js/gvp.mjs",
@@ -46,10 +49,14 @@
     "LICENSE-APACHE-2.0",
     "LICENSE-CC-BY-4.0",
     "middleware/index.mjs",
+    "audit/cli.mjs",
+    "audit/lib/",
+    "audit/README.md",
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-fixedpoint-2.mjs && node middleware/test.mjs && node examples/plain-http/test.mjs",
+    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-fixedpoint-2.mjs && node middleware/test.mjs && node examples/plain-http/test.mjs && node audit/test.mjs",
+    "check:audit": "node audit/test.mjs",
     "check:l1l2": "node tools/check-js.mjs",
     "check:jcs": "node tools/check-jcs.mjs",
     "vectors": "node tools/gen-vectors.mjs",

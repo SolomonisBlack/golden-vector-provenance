@@ -176,6 +176,11 @@ Two companion notes locate GVP in the wider stack:
   extension envelope (C1), the original `provenance` block x402toll.com still emits (C2), and the
   `response_provenance` extension field for signed compliance-receipt profiles (C3). Same bytes
   under every carriage.
+- [`audit/README.md`](audit/README.md) — **`gvp-audit`**, the closure audit for sellers: point it at the
+  bodies you actually served (or free surfaces) and it reports hidden-input signals, the carriage that
+  fits, format violations, vintage candidates, and whether an existing `responseHash` re-derives. It finds
+  violations; it never claims a route is closed. `npm i -g golden-vector-provenance` then
+  `gvp-audit bodies ./served --md report.md`.
 - [`docs/MEASURED-NOT-CLAIMED.md`](docs/MEASURED-NOT-CLAIMED.md) — explainer: what the x402
   counter episode (a headline metric that was a claim, not a measurement) means one layer down, at
   the response, and exactly what a re-derivable hash does and does not prove.
@@ -306,6 +311,9 @@ docs/REGULATORY-BRIDGE.md     GVP artifacts mapped to EU AI Act / ISO 42001 / NI
 docs/COMPLIANCE-MEMO-ART50-ART12.md  one-page memo for audit/compliance vendors: Art. 50(2) + Art. 12 fit and boundary
 docs/CARRIAGE-PROFILES.md     the three carriages (x402 envelope / provenance block / compliance-receipt field), same hash
 docs/MEASURED-NOT-CLAIMED.md  explainer: the x402 counter episode and what a re-derivable hash does and does not prove
+audit/cli.mjs                 gvp-audit: closure audit for sellers (bodies dir or free-surface fetch; never pays)
+audit/lib/                    analyze (heuristics, format, vintage, re-derivation) / diff / report / load / fetch
+audit/test.mjs                82-check suite: units + CLI end-to-end on generated fixtures (no network)
 examples/plain-http/          issuer + verifier on node:http with no payment rail — the rail-agnostic claim, executable
 LICENSE                       Apache-2.0 (code) / CC-BY-4.0 (spec) — full texts included
 ```
