@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.10.0 — 2026-09-19 (unreleased until reviewed)
+**Two reviewer-filed fixes, one reviewer-proposed audit class; no hash change.**
+
+- **`schema/receipt.schema.json`: `fixedPointVersion` is an enum of `/1` and `/2`** (was a `const` of
+  `/1`). Reported by cv-scvd as [issue #1](https://github.com/SolomonisBlack/golden-vector-provenance/issues/1)
+  on 2026-08-27 and left unanswered for three weeks: a conformant `/2` receipt failed validation against
+  this file. Mirrors how `signature.payloadVersion` already handles the split.
+- **Refusal-drift check** (`docs/REFUSALS.md` + `tools/check-refusal-drift.mjs`, in `npm test`).
+  Property filed by goun7 as [issue #2](https://github.com/SolomonisBlack/golden-vector-provenance/issues/2):
+  the documented refusal list and the `throw` sites in `ref/js/gvp.mjs` and `middleware/index.mjs` must
+  be exact reflections of each other in both directions, and every listed refusal must reach the digest
+  0 times. Fifteen refusals listed and probed. Negative-self-tested: a throw added without an entry, and
+  an entry whose throw was removed, both fail; a rename in both passes.
+- **`attachProvenance` under `"body"` compares canonical bytes, not digests**, so the carriage-mismatch
+  refusal reaches the digest 0 times like every other refusal (it previously hashed twice and then
+  threw, the hash-then-discard case the counter cannot see).
+- **`gvp-audit`: `ambiguous-absence`** (low). Class proposed by stillmarcus24 on x402#2887 (2026-09-19):
+  an absence-like value with no sibling status/ok/error/code member, so "nothing was there" and "the
+  instrument failed" may be byte-identical. Held to their companion rule: the detector reproduces a
+  known answer in `audit/test.mjs` (their described corpus shape: a sibling boolean disambiguates; the
+  same string without one is flagged) or its run is void.
+- README: fourth independent reproduction of the normative worked vector recorded (goun7, separate
+  RFC 8785 implementation, 134 bytes / `81ea1f22…`; re-run here from a clean clone the same day).
+
 ## 0.9.0 — 2026-09-18
 **Two reviewer-driven additions; no hash change.**
 

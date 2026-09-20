@@ -172,6 +172,33 @@ export function findVintageCandidates(value) {
   return out;
 }
 
+// ---------- ambiguous absence (class proposed by stillmarcus24, x402#2887, 2026-09-19) ----------
+// A well-formed wrong value: a member whose "nothing was there" state and whose "the instrument failed"
+// state are byte-identical, with no sibling that tells them apart. No canonicalization gate catches it;
+// the bytes are honest and the observation is false. Heuristic, low severity: it flags a SHAPE that
+// cannot show it distinguished the two, not a proven defect. Companion rule (theirs): a detector for this
+// class must reproduce a known answer or its run is void; audit/test.mjs holds that known answer.
+const VAL_ABSENCE = /^(none|null|nil|n\/?a|unknown|not[_\- ]?found|missing|unavailable|unresolved|no[_\-][a-z0-9_\-]+|empty|)$/i;
+const KEY_DISAMBIGUATOR = /(^|[_\-])(ok|success|succeeded|status|state|found|resolved|reached|reachable|discovery|probe|error|err|code|failure|failed|attempted|checked|available)([_\-]|$)/i;
+export function findAmbiguousAbsence(value) {
+  const out = [];
+  const visit = (v, path) => {
+    if (Array.isArray(v)) { v.forEach((x, i) => visit(x, `${path}/${i}`)); return; }
+    if (!v || typeof v !== 'object') return;
+    const keys = Object.keys(v);
+    const hasDisambiguator = keys.some(k => KEY_DISAMBIGUATOR.test(k) && (typeof v[k] === 'boolean' || typeof v[k] === 'number' || typeof v[k] === 'string'));
+    for (const k of keys) {
+      const x = v[k];
+      if ((typeof x === 'string' && VAL_ABSENCE.test(x.trim()) || x === null) && !hasDisambiguator) {
+        out.push({ path: `${path}/${k}`, key: k, sample: x === null ? 'null' : x.slice(0, 40) });
+      }
+      visit(x, `${path}/${k}`);
+    }
+  };
+  visit(value, '');
+  return out;
+}
+
 // ---------- provenance detection + re-derivation ----------
 
 export function findProvenance(body) {
@@ -258,6 +285,11 @@ export function analyzeBody(raw, meta = {}) {
       : shape.hasResultMember ? 'outside result: not hashed under "member"; a hidden input under "body"'
       : 'top-level member: a hidden input under "body" (the only carriage available to this shape)';
     findings.push({ severity: s.severity, kind: 'hidden-input', path: s.path, sample: s.sample, signals: s.kinds, note: `${s.note}; ${where}` });
+  }
+
+  for (const a of (isObject ? findAmbiguousAbsence(body) : [])) {
+    findings.push({ severity: 'low', kind: 'ambiguous-absence', path: a.path, sample: a.sample,
+      note: 'an absence-like value with no sibling status/ok/error/code member: "nothing was there" and "the instrument failed" may be byte-identical here; carry a distinguishing sibling or show the emitter distinguished them' });
   }
 
   const vintage = isObject ? findVintageCandidates(body) : [];

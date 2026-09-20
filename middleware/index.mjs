@@ -14,7 +14,7 @@
 //     omission because the hash won't match.
 //  2. The hash binds the QUESTION as well as the answer: `endpoint` and `inputs` are required members,
 //     so `responseHash` attests "this body answered this request", not merely "this body is unaltered".
-import { gvpHash } from '../ref/js/gvp.mjs';
+import { gvpHash, canonicalize } from '../ref/js/gvp.mjs';
 
 export const EXTENSION_KEY = 'response-provenance';
 export const SPEC_URL = 'https://github.com/SolomonisBlack/golden-vector-provenance';
@@ -97,8 +97,10 @@ export function attachProvenance(body, fixedPoint, { resultCarriage = 'member' }
   }
   assertCarriage(resultCarriage);
   if (resultCarriage === 'body') {
+    // Compare canonical bytes, not digests: a refusal must reach the digest 0 times (the hash-count
+    // and refusal-drift checks assert it), and canonical equality is exactly the property that matters.
     const recovered = recoverResult(body, 'body');
-    if (gvpHash({ ...fixedPoint, result: recovered }) !== gvpHash(fixedPoint)) {
+    if (canonicalize(fixedPoint.result) !== canonicalize(recovered)) {
       throw new TypeError('attachProvenance: under "body" carriage the fixed point result must equal the body minus extensions');
     }
   }

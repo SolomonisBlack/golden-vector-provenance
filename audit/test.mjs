@@ -157,6 +157,25 @@ ok('not-json note carries no source snippet', !/BEGIN|Unexpected token/.test(JSO
 import { MAX_TIMES, MAX_BODY_BYTES } from './lib/fetch.mjs';
 ok('fetch caps exist (times <= 10, body <= 16 MiB)', MAX_TIMES === 10 && MAX_BODY_BYTES === 16 * 1024 * 1024);
 
+// ---------- ambiguous absence (stillmarcus24, x402#2887 2026-09-19): KNOWN-ANSWER self-check ----------
+// Their companion rule: a detector for this class must reproduce a known answer or its run is void.
+// Known answer, from their own description of their corpus: rows carrying reason "no_live_payto_resolved"
+// WITH a sibling discovery_ok boolean are NOT ambiguous (the sibling disambiguates); the same string with
+// no sibling IS. A detector that flags the first is broken and must not report a number.
+{
+  const { findAmbiguousAbsence } = await import('./lib/analyze.mjs');
+  const disambiguated = { door: 'https://a.example', reason: 'no_live_payto_resolved', discovery_ok: false };
+  const ambiguous = { door: 'https://a.example', reason: 'no_live_payto_resolved' };
+  const corpus = [disambiguated, disambiguated, ambiguous, { door: 'x', reason: 'none' }, { door: 'y', reason: 'no_live_payto_resolved', discovery_ok: true }];
+  eq('known answer: sibling boolean disambiguates (not flagged)', findAmbiguousAbsence(disambiguated).length, 0);
+  eq('known answer: same string with no sibling is flagged', findAmbiguousAbsence(ambiguous).map(a => a.path), ['/reason']);
+  eq('known answer over the corpus: exactly 2 of 5 rows', corpus.filter(r => findAmbiguousAbsence(r).length).length, 2);
+  ok('ordinary strings are not flagged', findAmbiguousAbsence({ company: 'ACME', reason: 'sanctions match' }).length === 0);
+  ok('null with a status sibling is not flagged', findAmbiguousAbsence({ value: null, status: 'not-found' }).length === 0);
+  ok('analyzeBody surfaces the class as low', analyzeBody(JSON.stringify(ambiguous)).findings.some(f => f.kind === 'ambiguous-absence' && f.severity === 'low'));
+  ok('verdict unaffected by a low finding', auditRoute({ id: 'amb', samples: [{ name: '1', raw: JSON.stringify(ambiguous) }] }).verdict === 'no-closure-violation-found');
+}
+
 // ---------- determinism ----------
 const r1 = JSON.stringify(auditRoute({ id: 'd', samples: [{ name: '1', raw: JSON.stringify(flatClock) }] }));
 const r2 = JSON.stringify(auditRoute({ id: 'd', samples: [{ name: '1', raw: JSON.stringify(flatClock) }] }));

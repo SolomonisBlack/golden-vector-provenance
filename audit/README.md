@@ -69,6 +69,11 @@ either a hidden input (clock, nonce, runtime) or a data or vintage change you mu
   `provenance.responseHash` block (C2). With `endpoint` and `inputs` known, the hash is re-derived with the
   reference implementation and reported as `verified`, `contradicted`, `unverifiable`, or `no_claim`.
 - **Drift** between samples, classified: clock, nonce, runtime, vintage, data.
+- **Ambiguous absence** (low; class proposed by stillmarcus24 on x402#2887): an absence-like value
+  (`none`, `unknown`, `not_found`, `no_*`, `null`, empty) with no sibling status, ok, error, or code
+  member, so "nothing was there" and "the instrument failed" may be byte-identical. A well-formed wrong
+  value that no canonicalization gate catches. The detector is held to their companion rule: it must
+  reproduce a known answer (in `audit/test.mjs`) or its run is void.
 
 ## Honest limits
 

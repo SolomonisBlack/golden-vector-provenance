@@ -351,6 +351,13 @@ the spec text.
 - **A defect class sourced from the work.** `nonce-unbound-from-settlement` is registered in that desk's
   public [defect vocabulary](https://scvd.store/defects), *sourced by* this project and *registered by*
   them — the first outside-sourced class in their register.
+- **A fourth reproduction, from a separate RFC 8785 implementation (2026-09-19).** goun7 (Tamga)
+  ran the x402 extension's normative worked vector through the JCS implementation built for their
+  receipt ledger: 134 canonical bytes and `81ea1f22…`, exact; their verifier rejects an extra or a
+  missing member as `unverifiable` before hashing ([their report on x402#3304](https://github.com/x402-foundation/x402/pull/3304#issuecomment-5741759029);
+  tool `tools/x402_response_provenance.py` in goun7/tamga-protocol, Apache-2.0). Re-run here the same day
+  from a clean clone: `vector` printed the same 134 bytes and hash, and `verify` on a fixed point with an
+  extra member returned `unverifiable`.
 - **Three independent cross-checks** reproduced the published vectors with their own code:
   [whawk46/x402-jcs-crosscheck](https://github.com/whawk46/x402-jcs-crosscheck) (24/24, vectors pinned
   not vendored); the SCVD desk (§8.1, above); and giskard09, who on 2026-09-15 reconstructed the
