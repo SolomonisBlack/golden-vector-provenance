@@ -284,6 +284,39 @@ design — the region our vectors live in. Note the distinction this repo keeps:
 verification is not the same claim as adoption. (For the merged external adoption, see
 **Status and governance** below.)
 
+### Independent ML-DSA-65 signer cross-check (TenPrint)
+
+The `/3` ML-DSA-65 vectors are signed by `node:crypto` (OpenSSL). To show they are not an artifact of
+one ML-DSA implementation, `tools/tenprint-mldsa65/` re-signs the **same eight ML-DSA-65 payloads,
+over the same `canonicalPayload` bytes**, with TenPrint's signing code: `@noble/post-quantum` 0.3.0,
+`ml_dsa65.sign(secretKey, messageBytes)` — pure ML-DSA, empty context, no prehash — under a **new
+throwaway key** (`vectors/attestation-key-tenprint-mldsa65.json`, not a production key). The output,
+`vectors/attestation-v3-tenprint-mldsa65.json`, has the same group shape as `attestation-v3.json`.
+
+noble is pinned to exactly 0.3.0 in a tools-only `package.json` inside that directory; the package's
+own dependencies and runtime are unchanged.
+
+```bash
+cd tools/tenprint-mldsa65 && npm install
+node gen-attestation-v3-tenprint-mldsa65.mjs     # (re)sign; reuses the throwaway key if present
+node check-attestation-v3-tenprint-mldsa65.mjs   # both directions; Node >= 24.7 for direction B
+```
+
+The check proves both directions and fails, rather than skips, a direction it cannot run:
+
+- **A — noble verifies the reference:** noble 0.3.0 verifies every ML-DSA-65 signature in
+  `attestation-v3.json` over the bytes `attestationPayload()` rebuilds, and rejects a tampered
+  payload and a non-empty context. noble `keygen(seed)` on the reference key's seed also rebuilds
+  the reference expanded key and public key byte-for-byte.
+- **B — the reference verifies noble:** the repo's verify path (`node:crypto` `verify(null, …)` as in
+  `check-attestation-v3.mjs`, plus `verifyAttestation`) verifies every signature in the new file and
+  contradicts a tampered `responseHash`; the throwaway PKCS#8 key loads in `node:crypto` and derives
+  the published SPKI. `node:crypto` has ML-DSA from Node 24.7, so on an older Node direction B is
+  reported `UNAVAILABLE` and counted as a failure.
+
+ML-DSA-65 signing is hedged, so these signatures change if regenerated and are verify-only, like the
+reference ML-DSA-65 group.
+
 ## Licensing
 
 `LICENSE` is the verbatim **Apache-2.0** text, so automated scanners classify this repository
@@ -302,6 +335,9 @@ for `vectors/attestation-key-mldsa65.json`, the throwaway ML-DSA-65 key behind t
 vectors; it was generated for the vectors and has never signed anything else. It is stored in the
 PKCS#8 form `node:crypto` exports (seed plus expanded key), which Python `cryptography` 50 does not
 load; that only matters for re-signing, since the ML-DSA-65 vectors are verify-only.
+`vectors/attestation-key-tenprint-mldsa65.json` is a third throwaway key, in the same form, generated
+only for the TenPrint ML-DSA-65 cross-check above. It is not a TenPrint production key and has never
+signed anything but `vectors/attestation-v3-tenprint-mldsa65.json`.
 
 ## Layout
 ```
@@ -320,6 +356,7 @@ tools/gen-vectors.mjs         generate L1 hashes (optional GVP_CALC_CORE cross-c
 tools/gen-attestation.mjs     generate L2 attestation vectors (/1, /2) with the fixed test key
 tools/gen-attestation-v3.mjs  generate the /3 vectors (Ed25519 + ML-DSA-65) and the key-first outcome table
 tools/check-attestation-v3.mjs  /3 check: vectors, outcomes (verified / unverifiable / contradicted), refetch bound
+tools/tenprint-mldsa65/       ML-DSA-65 cross-check: re-sign /3 with @noble/post-quantum 0.3.0, verify both ways (tools-only deps)
 docs/RECOMPUTE-NOT-TRUST.md   category note: the five trust models and where GVP sits
 docs/REGULATORY-BRIDGE.md     GVP artifacts mapped to EU AI Act / ISO 42001 / NIST AI RMF evidence classes
 docs/COMPLIANCE-MEMO-ART50-ART12.md  one-page memo for audit/compliance vendors: Art. 50(2) + Art. 12 fit and boundary

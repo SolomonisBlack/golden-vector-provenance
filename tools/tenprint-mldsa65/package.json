@@ -1,0 +1,16 @@
+{
+  "name": "gvp-tenprint-mldsa65-crosscheck",
+  "private": true,
+  "description": "Tools-only: independent ML-DSA-65 cross-check of the GVP-Attestation/3 vectors with @noble/post-quantum 0.3.0 (TenPrint's signer). Not part of the published package runtime.",
+  "type": "module",
+  "scripts": {
+    "gen": "node gen-attestation-v3-tenprint-mldsa65.mjs",
+    "check": "node check-attestation-v3-tenprint-mldsa65.mjs"
+  },
+  "devDependencies": {
+    "@noble/post-quantum": "0.3.0"
+  },
+  "engines": {
+    "node": ">=24.7"
+  }
+}
