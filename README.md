@@ -139,7 +139,7 @@ conformance-check implementation, 2026-08-24.
 
 ## Conformance levels
 - **L1 — Reproducible:** the response carries the canonical hash and a free re-derivation path.
-- **L2 — Signed:** L1 + an Ed25519 issuer attestation with a key-id (old keys stay verifiable).
+- **L2 — Signed:** L1 + an issuer attestation (Ed25519 or ML-DSA-65) with a key-id (old keys stay verifiable).
 - **L3 — Anchored:** L2 + an on-chain identity binding (e.g. ERC-8004).
 
 **L1 is the layer that matters.** L2 and L3 are conveniences that other standards already provide;
@@ -214,12 +214,14 @@ escaping non-ASCII). This repo proves all of it empirically before relying on th
 ```bash
 npm install
 npm test                                       # L1 hashes + L2 signatures + the JCS gate
+node tools/check-attestation-v3.mjs            # /3: Ed25519 + ML-DSA-65 vectors, key-first outcomes, key-list refetch bound
 
 node tools/check-js.mjs                        # JS: reproduce L1 hashes + verify L2 signatures
 node tools/check-jcs.mjs                       # JS canonicalization vs an INDEPENDENT RFC 8785 impl
 py -3 ref/py/gvp.py vectors/expected.json      # Python: reproduce every hash byte-for-byte
 uv run --with cryptography ref/py/attest.py    # Python: verify JS's signatures AND reproduce them
-                                               # byte-identically (Ed25519 is deterministic)
+                                               # byte-identically (Ed25519 is deterministic; ML-DSA-65
+                                               # is hedged, so verify-only) + the /3 outcome table
 node tools/gen-vectors.mjs                     # regenerate L1 vectors from vectors/canonicalization.json
 ```
 
@@ -295,7 +297,11 @@ verbatim texts in `LICENSE-APACHE-2.0` and `LICENSE-CC-BY-4.0` and the split exp
 `vectors/attestation-key.json` contains a **fixed throwaway private key**, published deliberately so
 anyone can reproduce the L2 attestation vectors byte-for-byte. It is not, and has never been, a
 production signing key — verified: it derives public key `MCowBQYDK2VwAyEA/UETLdE5...`, which differs
-from the live issuer key published at `x402toll.com/.well-known/receipt-pubkey.json`.
+from the live issuer key published at `x402toll.com/.well-known/receipt-pubkey.json`. The same holds
+for `vectors/attestation-key-mldsa65.json`, the throwaway ML-DSA-65 key behind the verify-only `/3`
+vectors; it was generated for the vectors and has never signed anything else. It is stored in the
+PKCS#8 form `node:crypto` exports (seed plus expanded key), which Python `cryptography` 50 does not
+load; that only matters for re-signing, since the ML-DSA-65 vectors are verify-only.
 
 ## Layout
 ```
@@ -304,14 +310,16 @@ schema/receipt.schema.json    JSON Schema (draft 2020-12) for a Verification Rec
 schema/revocation-list.schema.json  JSON Schema for the signed, append-only revocation list
 index.mjs                     package entry point (re-exports L1 + L2)
 ref/js/gvp.mjs                JS reference: canonicalize() + gvpHash()  (L1)
-ref/js/attest.mjs             JS reference: Ed25519 attest()/verifyAttest()  (L2)
+ref/js/attest.mjs             JS reference: attest()/verifyAttestation()/createKeyListResolver(), Ed25519 + ML-DSA-65 (L2)
 ref/py/gvp.py                 Python reference: canonicalize() + gvp_hash() + a vectors runner (L1)
-ref/py/attest.py              Python reference: Ed25519 attest/verify + cross-lang proof (L2)
+ref/py/attest.py              Python reference: attest/verify_attestation, Ed25519 + ML-DSA-65 + cross-lang proof (L2)
 vectors/                      conformance vectors + generated expected.json / attestation.json
 tools/check-js.mjs            JS conformance check (L1 + L2)
 tools/check-jcs.mjs           RFC 8785 equivalence gate (vs an independent implementation)
 tools/gen-vectors.mjs         generate L1 hashes (optional GVP_CALC_CORE cross-check vs a 2nd impl)
-tools/gen-attestation.mjs     generate L2 attestation vectors with the fixed test key
+tools/gen-attestation.mjs     generate L2 attestation vectors (/1, /2) with the fixed test key
+tools/gen-attestation-v3.mjs  generate the /3 vectors (Ed25519 + ML-DSA-65) and the key-first outcome table
+tools/check-attestation-v3.mjs  /3 check: vectors, outcomes (verified / unverifiable / contradicted), refetch bound
 docs/RECOMPUTE-NOT-TRUST.md   category note: the five trust models and where GVP sits
 docs/REGULATORY-BRIDGE.md     GVP artifacts mapped to EU AI Act / ISO 42001 / NIST AI RMF evidence classes
 docs/COMPLIANCE-MEMO-ART50-ART12.md  one-page memo for audit/compliance vendors: Art. 50(2) + Art. 12 fit and boundary

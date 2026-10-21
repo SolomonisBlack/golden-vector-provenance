@@ -1,6 +1,6 @@
 {
   "name": "golden-vector-provenance",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Reproducible provenance for computed answers: a canonical SHA-256 fixed point (RFC 8785 JCS) that anyone can re-derive for free, so you recompute the answer instead of trusting the server.",
   "keywords": [
     "provenance",
@@ -9,6 +9,7 @@
     "rfc8785",
     "jcs",
     "ed25519",
+    "ml-dsa",
     "attestation",
     "receipt",
     "verifiable",
@@ -32,7 +33,9 @@
     "./vectors": "./vectors/expected.json",
     "./package.json": "./package.json",
     "./middleware": "./middleware/index.mjs",
-    "./vectors/attestation-v2": "./vectors/attestation-v2.json"
+    "./vectors/attestation-v2": "./vectors/attestation-v2.json",
+    "./vectors/attestation-v3": "./vectors/attestation-v3.json",
+    "./vectors/attestation-outcomes": "./vectors/attestation-outcomes.json"
   },
   "files": [
     "index.mjs",
@@ -56,7 +59,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-fixedpoint-2.mjs && node tools/check-hash-count.mjs && node tools/check-refusal-drift.mjs && node middleware/test.mjs && node examples/plain-http/test.mjs && node audit/test.mjs",
+    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-attestation-v3.mjs && node tools/check-fixedpoint-2.mjs && node tools/check-hash-count.mjs && node tools/check-refusal-drift.mjs && node middleware/test.mjs && node examples/plain-http/test.mjs && node audit/test.mjs",
     "check:audit": "node audit/test.mjs",
     "check:hash-count": "node tools/check-hash-count.mjs",
     "check:refusal-drift": "node tools/check-refusal-drift.mjs",
@@ -69,7 +72,9 @@
     "check:fp2": "node tools/check-fixedpoint-2.mjs",
     "vectors:v2": "node tools/gen-vectors-v2.mjs",
     "verifier-precondition": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-fixedpoint-2.mjs",
-    "check:plain-http": "node examples/plain-http/test.mjs"
+    "check:plain-http": "node examples/plain-http/test.mjs",
+    "check:l2v3": "node tools/check-attestation-v3.mjs",
+    "attestation:v3": "node tools/gen-attestation-v3.mjs"
   },
   "devDependencies": {
     "canonicalize": "^2.1.0"

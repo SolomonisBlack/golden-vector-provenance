@@ -1,0 +1,528 @@
+{
+  "spec": "spec/gvp-0.2.md §6.3",
+  "note": "keyList \"published\" = the list below, fetched from the origin the verifier paid; \"unreachable\" = it could not be fetched; \"none\" = integrity-only check against the embedded publicKey (verified means integrity, not identity). \"implemented\", when present, restricts the algorithms the verifier implements. A verifier that lacks the algorithm a case \"requires\" MUST report unverifiable for it (spec §8).",
+  "keyList": {
+    "issuer": "gvp.example",
+    "keys": [
+      {
+        "keyId": "gvp-test-ed25519-1",
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM="
+      },
+      {
+        "keyId": "gvp-test-mldsa65-1",
+        "alg": "ML-DSA-65",
+        "publicKey": "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"
+      },
+      {
+        "keyId": "gvp-test-slhdsa-1",
+        "alg": "SLH-DSA-SHA2-128s",
+        "publicKey": "MDAwCwYJYIZIAWUDBAMUAyEAm7GA+i54iPITgHpLeMOKr3b2I0qiZczPclI2hAV2meM="
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "ed25519-v3-intact",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "verified"
+    },
+    {
+      "name": "mldsa65-v3-intact",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "ML-DSA-65"
+      },
+      "signature": {
+        "alg": "ML-DSA-65",
+        "keyId": "gvp-test-mldsa65-1",
+        "signature": "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"
+      },
+      "keyList": "published",
+      "expected": "verified",
+      "requires": "ML-DSA-65"
+    },
+    {
+      "name": "mldsa65-v3-intact, verifier implements Ed25519 only",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "ML-DSA-65"
+      },
+      "signature": {
+        "alg": "ML-DSA-65",
+        "keyId": "gvp-test-mldsa65-1",
+        "signature": "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"
+      },
+      "keyList": "published",
+      "implemented": [
+        "Ed25519"
+      ],
+      "expected": "unverifiable"
+    },
+    {
+      "name": "ed25519-v2-legacy-with-keyId",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/2",
+        "fixedPointVersion": "GVP-FixedPoint/1"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "en1/DJ22ZW2LtgvkVkZQcCDqWsi6VT5sHaMdO/MQ7EKSH4B4IK9j2ufrFwV4b4uypgtC1ni0AnyxvqypUGc0Ag=="
+      },
+      "keyList": "published",
+      "expected": "verified"
+    },
+    {
+      "name": "ed25519-v2-legacy-no-keyId (matched by publicKey)",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/2",
+        "fixedPointVersion": "GVP-FixedPoint/1"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "signature": "en1/DJ22ZW2LtgvkVkZQcCDqWsi6VT5sHaMdO/MQ7EKSH4B4IK9j2ufrFwV4b4uypgtC1ni0AnyxvqypUGc0Ag==",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM="
+      },
+      "keyList": "published",
+      "expected": "verified"
+    },
+    {
+      "name": "ed25519-v1-legacy-no-keyId (matched by publicKey)",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "NYWN11qg3/G1oXV7SEwjcmVhi+q8jJYiiMxKX7nDw3KL+u0fkNrCnbw92eFUCmxSQCMfru7LQyD64lcpBp4cDQ=="
+      },
+      "keyList": "published",
+      "expected": "verified"
+    },
+    {
+      "name": "v2 no keyId, embedded publicKey not in list",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/2",
+        "fixedPointVersion": "GVP-FixedPoint/1"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "signature": "en1/DJ22ZW2LtgvkVkZQcCDqWsi6VT5sHaMdO/MQ7EKSH4B4IK9j2ufrFwV4b4uypgtC1ni0AnyxvqypUGc0Ag==",
+        "publicKey": "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"
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "v3 keyId stripped, integrity-only check",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "none",
+      "expected": "contradicted"
+    },
+    {
+      "name": "v3 intact, integrity-only check",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ==",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM="
+      },
+      "keyList": "none",
+      "expected": "verified"
+    },
+    {
+      "name": "keyId missing from fetched key list",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-unknown-9f3a",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "key list unreachable",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "unreachable",
+      "expected": "unverifiable"
+    },
+    {
+      "name": "keyId points at a key under an unimplemented alg",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "SLH-DSA-SHA2-128s"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-slhdsa-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "unverifiable"
+    },
+    {
+      "name": "signed alg rewritten Ed25519 -> ML-DSA-65",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "ML-DSA-65"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "signed alg rewritten to an unknown string",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "none"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "keyId rewritten to the other algorithm's key",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-mldsa65-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "v2 receipt pointed at the ML-DSA-65 key",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/2",
+        "fixedPointVersion": "GVP-FixedPoint/1"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-mldsa65-1",
+        "signature": "en1/DJ22ZW2LtgvkVkZQcCDqWsi6VT5sHaMdO/MQ7EKSH4B4IK9j2ufrFwV4b4uypgtC1ni0AnyxvqypUGc0Ag=="
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "v3 alg stripped",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "v3 keyId stripped",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "v3 downgraded to v2 shape",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/2",
+        "fixedPointVersion": "GVP-FixedPoint/1"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "embedded publicKey differs from listed key",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ==",
+        "publicKey": "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"
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "mldsa65 signed with a non-empty context",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "ML-DSA-65"
+      },
+      "signature": {
+        "alg": "ML-DSA-65",
+        "keyId": "gvp-test-mldsa65-1",
+        "signature": "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"
+      },
+      "keyList": "published",
+      "expected": "contradicted",
+      "requires": "ML-DSA-65"
+    },
+    {
+      "name": "unsupported payloadVersion",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/9",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "unverifiable"
+    },
+    {
+      "name": "CONTROL: responseHash tampered",
+      "payload": {
+        "responseHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "published",
+      "expected": "contradicted"
+    },
+    {
+      "name": "CONTROL: mldsa65 responseHash tampered",
+      "payload": {
+        "responseHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "ML-DSA-65"
+      },
+      "signature": {
+        "alg": "ML-DSA-65",
+        "keyId": "gvp-test-mldsa65-1",
+        "signature": "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"
+      },
+      "keyList": "published",
+      "expected": "contradicted",
+      "requires": "ML-DSA-65"
+    }
+  ]
+}

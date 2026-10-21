@@ -288,7 +288,7 @@ conformance MUST reproduce every `expectedHash` in `vectors/expected.json`.
 | Level | Name | Requirements |
 |---|---|---|
 | **L1** | Reproducible | The answer carries `responseHash` (§3) **and** a free, unauthenticated way to re-derive it (a golden-vector endpoint returning the canonical `inputs → result → hash`, or the fixed point itself). Anyone can recompute and compare. |
-| **L2** | Signed | L1 **plus** an Ed25519 issuer attestation (§6) with a resolvable key-id; the issuer publishes the verifying public key. |
+| **L2** | Signed | L1 **plus** an issuer attestation (§6: Ed25519 or ML-DSA-65) with a resolvable key-id; the issuer publishes the verifying public key in its key list. |
 | **L3** | Anchored | L2 **plus** an on-chain identity binding for the issuer (e.g. an ERC-8004 `agentId` in a named registry/chain). |
 
 A receipt (§5) declares its level implicitly by which members are present. L1 is the floor; a consumer
@@ -308,10 +308,10 @@ A **receipt** is a portable record wrapping a fixed point plus its recompute-tru
 - If `signature` is present it MUST verify under §6; a present-but-invalid signature makes the receipt
   non-conformant (a consumer MUST reject it).
 
-## 6. Ed25519 attestation (L2)
+## 6. Issuer attestation (L2)
 
 The issuer signs the **attestation payload**, the canonical JSON (§2.2) of a **named payload shape**.
-Two shapes are defined; the shape identifier is itself a member of the signed object, so a verifier
+Three shapes are defined; the shape identifier is itself a member of the signed object, so a verifier
 learns which shape to reconstruct *from the receipt* and an attacker cannot strip or forge it without
 failing the signature:
 
@@ -320,31 +320,129 @@ GVP-Attestation/1  (legacy — receipts issued before fixedPointVersion existed;
 { "responseHash": <string>, "endpoint": <string>, "dataVintage": <string>,
   "issuer": <string>, "agentId": <string|null>, "issuedAt": <RFC3339 string> }
 
-GVP-Attestation/2  (current)
+GVP-Attestation/2  (Ed25519 only; no alg member)
 { "responseHash": <string>, "endpoint": <string>, "dataVintage": <string>,
   "issuer": <string>, "agentId": <string|null>, "issuedAt": <RFC3339 string>,
   "payloadVersion": "GVP-Attestation/2", "fixedPointVersion": "GVP-FixedPoint/1" }
+
+GVP-Attestation/3  (current — /2 plus the signing algorithm, signed)
+{ "responseHash": <string>, "endpoint": <string>, "dataVintage": <string>,
+  "issuer": <string>, "agentId": <string|null>, "issuedAt": <RFC3339 string>,
+  "payloadVersion": "GVP-Attestation/3", "fixedPointVersion": "GVP-FixedPoint/1",
+  "alg": "Ed25519" | "ML-DSA-65" }
 ```
 
 - **Shape selection is explicit, never guessed.** A payload with no `payloadVersion` member is shape
   `/1`. A verifier MUST reconstruct the shape the receipt declares and MUST NOT try alternatives on
-  failure (trying shapes until one verifies would let an attacker downgrade a `/2` receipt to `/1`).
-  New receipts SHOULD be `/2`; `/1` remains valid for receipts already issued.
-- **`fixedPointVersion` is bound here, at L2** — inside the signed payload — and nowhere else. It is
-  deliberately NOT inside the hashed L1 fixed point (that would move every existing `responseHash`) and
-  its unsigned L1 sibling (§2.1.1) is informational only.
-- `/1` and `/2` sign different byte strings for the same logical receipt; that is intended and the
-  conformance vectors cover both (`vectors/attestation.json`, `vectors/attestation-v2.json`).
-- Algorithm: **Ed25519** (RFC 8032), over the UTF-8 bytes of that canonical string. Because Ed25519 is
-  deterministic, independent conformant signers produce identical signature bytes for the same key and
-  payload.
-- The `signature` object carries `alg: "Ed25519"`, the `publicKey` (base64 SPKI DER), the base64
-  `signature`, and the `signed` recipe string. It MAY carry a `keyId`.
-- **Key rotation & key-ids:** an issuer MAY rotate signing keys. Every attestation MUST be verifiable
-  for the life of the receipt: the issuer MUST keep all historical public keys resolvable (by key-id),
-  so a receipt signed by a rotated-out key still verifies. A verifier proving *issuer identity* (not
-  just integrity) MUST compare the embedded `publicKey` against the issuer's published key for that
-  key-id; a match under the receipt's own embedded key proves integrity only.
+  failure (trying shapes until one verifies would let an attacker downgrade a `/3` receipt to `/2`, or
+  a `/2` receipt to `/1`). New receipts SHOULD be `/3`; `/1` and `/2` remain valid for receipts already
+  issued and keep verifying unchanged.
+- **`fixedPointVersion` is bound here, at L2** — inside the signed payload of `/2` and `/3` — and
+  nowhere else. It is deliberately NOT inside the hashed L1 fixed point (that would move every existing
+  `responseHash`) and its unsigned L1 sibling (§2.1.1) is informational only.
+- `/1`, `/2` and `/3` sign different byte strings for the same logical receipt; that is intended and
+  the conformance vectors cover all three (`vectors/attestation.json`, `vectors/attestation-v2.json`,
+  `vectors/attestation-v3.json`).
+
+### 6.1 Algorithms
+
+The signature is computed over the UTF-8 bytes of the canonical payload string, with no pre-hash.
+Two algorithms are defined:
+
+| `alg` | Scheme | Signature bytes |
+|---|---|---|
+| `Ed25519` | Ed25519, RFC 8032 (pure) | deterministic: independent conformant signers produce identical bytes for the same key and payload |
+| `ML-DSA-65` | ML-DSA-65, FIPS 204, **pure** (not HashML-DSA), **empty context string** (`ctx = ""`, 0 bytes) | hedged by default, so two runs differ; ML-DSA-65 vectors are verify-only |
+
+- **`alg` is signed under `/3`.** `/1` and `/2` have no `alg` member; a verifier MUST read their
+  algorithm as `"Ed25519"`, the same way a missing `payloadVersion` means `/1`. An ML-DSA-65 attestation
+  therefore requires `/3`.
+- **ML-DSA-65 mode is fixed.** A signer MUST use pure ML-DSA-65 with the empty context string, and a
+  verifier MUST verify with the empty context string and MUST NOT try another context or HashML-DSA.
+  Domain separation already comes from `payloadVersion` inside the signed bytes, so a fixed label would
+  add a parameter for every implementation to get right and separate nothing further. The empty context
+  is the default of `node:crypto` (`crypto.sign(null, msg, key)`) and of the common WebCrypto and
+  pqcrypto bindings, so implementations agree bit-for-bit without options. A signature made under any
+  other context or under HashML-DSA fails to verify and is reported as `contradicted` (§6.3).
+- A new algorithm is added only by listing it in this table with its own conformance vectors.
+
+### 6.2 Signature object, key list, and where the key list lives
+
+- The `signature` object carries the base64 `signature`, the `keyId`, the `signed` recipe string and an
+  informational copy of `alg` and `payloadVersion`. Under `/3`, `keyId` is REQUIRED and `publicKey`
+  (base64 SPKI DER) is OPTIONAL; under `/1` and `/2`, `publicKey` is REQUIRED and `keyId` OPTIONAL, as
+  before. The unsigned `alg` copy MUST NOT be used to select an algorithm (§6.3).
+- **The signature and the key travel in the body, or the key by `keyId`; never in an HTTP header.** An
+  ML-DSA-65 signature is 3,309 bytes and its SPKI public key 1,974 bytes, which base64 pushes past
+  common header limits; a header that a proxy truncates or drops would turn a valid receipt into an
+  unverifiable one.
+- **Key list.** The issuer publishes every signing key it has ever used in a key list:
+
+  ```
+  { "issuer": <string>,
+    "keys": [ { "keyId": <string>, "alg": "Ed25519" | "ML-DSA-65", "publicKey": <base64 SPKI DER> } ] }
+  ```
+
+  Each entry pins exactly one `alg`, and the key's SPKI algorithm MUST match it. Every attestation MUST
+  be verifiable for the life of the receipt: the issuer MUST keep every historical key listed, so a
+  receipt signed by a rotated-out key still verifies. An issuer MUST publish a key before the first
+  receipt signed with it and SHOULD do so at least the freshness floor (§6.3) ahead.
+- **Locating the key list.** A verifier MUST locate the key list from context it already holds, never
+  from a field of the receipt: for a paid HTTP response, `/.well-known/gvp-keys.json` on the origin the
+  verifier paid. Every receipt field, `issuer` included, is unauthenticated until the signature checks;
+  resolving the list from one would let an intermediary rewrite it to an unreachable directory and
+  steer the outcome to `unverifiable`.
+
+### 6.3 Verification: key-first dispatch and outcomes (normative)
+
+A verifier chooses the algorithm from the **key**, never from the receipt (the rule RFC 8725 §3.1 sets
+for JWS). It reconstructs the declared payload shape, resolves the key list (§6.2), looks up `keyId`,
+and verifies under the `alg` pinned to that key entry. Attestation verification terminates in exactly
+one of three states, and implementations MUST NOT collapse them:
+
+- **`verified`** — the signature verifies under the listed key and its pinned `alg`, and the signed
+  `alg` equals the pinned `alg`. This proves issuance by the holder of that key, never correctness (§1).
+- **`unverifiable`** — the verifier cannot evaluate the attestation, a statement about the verifier and
+  not about the issuer: the key list cannot be fetched; or the pinned `key.alg` is one the verifier does
+  not implement; or the declared `payloadVersion` is one it does not implement.
+- **`contradicted`** — evaluation ran and failed: the key list was fetched and does not contain
+  `keyId`; or the signed `alg` (`"Ed25519"` for `/1` and `/2`) differs from the pinned `key.alg`,
+  including an unknown string; or an embedded `publicKey` differs from the listed key; or a `/3`
+  receipt lacks `keyId` or `alg`; or the signature does not verify.
+
+**Receipts without `keyId`.** `keyId` was OPTIONAL under `/1` and `/2`, so a `/1` or `/2` receipt
+without one is matched to the key list by its embedded `publicKey` (the pre-`/3` identity rule) and
+then evaluated as above; an embedded `publicKey` that is not in the fetched list is `contradicted`. A
+key-list entry without a string `keyId` never matches by key-id.
+
+The split is deliberate. A rewritten `keyId`, `alg` or embedded key MUST NOT let an intermediary choose
+`unverifiable` over `contradicted`. (The one deliberate exception is a `payloadVersion` the verifier
+does not implement: a newer shape must stay reportable as "not understood here" rather than as forged,
+which is why the shape identifier sits inside the signed bytes.) Because the issuer MUST keep every key it has used listed (§6.2), it cannot legitimately
+issue a receipt whose `keyId` is missing from its own list, so a missing `keyId` is a contradiction,
+not a lookup failure. Likewise an unknown signed `alg` cannot select an unimplemented primitive,
+because the primitive comes from the key. A verifier MUST NOT try alternative keys, algorithms,
+payload shapes or contexts after a failure.
+
+**Refetch on a missing `keyId`, bounded.** A verifier holding a cached key list that does not contain
+`keyId` refetches once before reporting `contradicted`; that is a fresh read of the same source, not a
+search. Refetches MUST be coalesced per origin (concurrent misses share one in-flight fetch) and SHOULD
+be gated by a minimum freshness floor (RECOMMENDED: 60 seconds) and use a conditional request
+(`If-None-Match` / `ETag`) where the origin supports one. Within the floor the cached list *is* the
+fresh read: a `keyId` missing from it is `contradicted` without another fetch. A refetch that fails
+means the fresh read did not happen, so that miss is `unverifiable`, and the failed attempt is floored
+the same way, including a first fetch that fails. Without the floor an on-path intermediary injecting random `keyId`s into concurrent responses could force one key-list fetch per
+receipt. The floor bounds load only; it never moves a case between `unverifiable` and `contradicted`.
+
+**Integrity-only verification.** A verifier without the key list MAY verify against an embedded
+`publicKey`, dispatching on that key's SPKI algorithm under the same rules (a `/3` receipt without
+`keyId` is still `contradicted`). The result proves integrity only, MUST be reported as such, and is
+never a statement of issuer identity.
+
+*Rationale: `alg` inside the signed payload was raised by @0xsims (TenPrint, x402-foundation/x402#3234,
+2026-10-14) with the ML-DSA-65 use case; the point that signing `alg` is not enough, because the
+verifier must pick a primitive before it can check the signature, by @whawk46 the same day; the bounded
+refetch and the fixed ML-DSA-65 mode and context by @whawk46 on 2026-10-16.*
 
 ## 7. Revocation (errata path)
 
@@ -373,8 +471,11 @@ values. Schema: `schema/revocation-list.schema.json`.
 
 `vectors/canonicalization.json` holds the input fixed points; `vectors/expected.json` holds the
 canonical-hash fixtures. An implementation is **L1-conformant** iff it reproduces every `expectedHash`.
-L2 conformance additionally requires reproducing the attestation vectors in `vectors/attestation.json`
-(sign-and-verify round trips and a cross-implementation verify). The suite MUST pass in at least two
+L2 conformance additionally requires reproducing the attestation vectors in `vectors/attestation.json`,
+`vectors/attestation-v2.json` and `vectors/attestation-v3.json` (sign-and-verify round trips and a
+cross-implementation verify), and reaching the expected outcome (§6.3) for every case in
+`vectors/attestation-outcomes.json`. A verifier that does not implement ML-DSA-65 MUST report
+`unverifiable` for the ML-DSA-65 cases, and is conformant in doing so. The suite MUST pass in at least two
 independent implementations; the repo ships JS (`ref/js`) and Python (`ref/py`) references that do.
 
 ### 8.1 Verifier conformance is a precondition for stating a finding (normative)
@@ -421,5 +522,9 @@ remedy is a precondition on issuing a finding rather than another branch inside 
 - Reject non-finite numbers and over-deep nesting (§2) to keep hashing total and DoS-resistant.
 - A signature over the issuer's *own embedded* key proves integrity, not identity — identity requires
   the issuer's independently-published key (§6).
+- Every receipt field is unauthenticated until the signature checks, so none of them may choose how the
+  signature is checked: the algorithm comes from the listed key, the key list from the origin the
+  verifier paid, and a rewritten `keyId` or `alg` is `contradicted`, never `unverifiable` (§6.3).
+  Key-list refetches are coalesced and floored so injected `keyId`s cannot become a fetch amplifier.
 - Revocation is the only sanctioned way to walk back an issued answer; keep it signed and append-only
   (§7) so it cannot itself be used to silently rewrite history.
