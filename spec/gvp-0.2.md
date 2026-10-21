@@ -385,7 +385,8 @@ Two algorithms are defined:
 
   Each entry pins exactly one `alg`, and the key's SPKI algorithm MUST match it. Every attestation MUST
   be verifiable for the life of the receipt: the issuer MUST keep every historical key listed, so a
-  receipt signed by a rotated-out key still verifies. An issuer MUST publish a key before the first
+  receipt signed by a rotated-out key still verifies. The list is append-only: a `keyId`, once listed,
+  MUST stay bound to the same `alg` and `publicKey` and MUST NOT be removed or rebound. An issuer MUST publish a key before the first
   receipt signed with it and SHOULD do so at least the freshness floor (§6.3) ahead.
 - **Locating the key list.** A verifier MUST locate the key list from context it already holds, never
   from a field of the receipt: for a paid HTTP response, `/.well-known/gvp-keys.json` on the origin the
@@ -403,16 +404,18 @@ one of three states, and implementations MUST NOT collapse them:
 - **`verified`** — the signature verifies under the listed key and its pinned `alg`, and the signed
   `alg` equals the pinned `alg`. This proves issuance by the holder of that key, never correctness (§1).
 - **`unverifiable`** — the verifier cannot evaluate the attestation, a statement about the verifier and
-  not about the issuer: the key list cannot be fetched; or the pinned `key.alg` is one the verifier does
+  not about the issuer: the key list cannot be fetched and no kept entry covers the receipt (see "Kept
+  key lists" below); or the pinned `key.alg` is one the verifier does
   not implement; or the declared `payloadVersion` is one it does not implement.
 - **`contradicted`** — evaluation ran and failed: the key list was fetched and does not contain
-  `keyId`; or the signed `alg` (`"Ed25519"` for `/1` and `/2`) differs from the pinned `key.alg`,
+  `keyId`, and no kept entry holds it ("Kept key lists" below); or the signed `alg` (`"Ed25519"` for `/1` and `/2`) differs from the pinned `key.alg`,
   including an unknown string; or an embedded `publicKey` differs from the listed key; or a `/3`
   receipt lacks `keyId` or `alg`; or the signature does not verify.
 
 **Receipts without `keyId`.** `keyId` was OPTIONAL under `/1` and `/2`, so a `/1` or `/2` receipt
 without one is matched to the key list by its embedded `publicKey` (the pre-`/3` identity rule) and
-then evaluated as above; an embedded `publicKey` that is not in the fetched list is `contradicted`. A
+then evaluated as above; an embedded `publicKey` that is not in the fetched list, and not in a kept
+list, is `contradicted`. A
 key-list entry without a string `keyId` never matches by key-id.
 
 The split is deliberate. A rewritten `keyId`, `alg` or embedded key MUST NOT let an intermediary choose
@@ -429,10 +432,44 @@ payload shapes or contexts after a failure.
 search. Refetches MUST be coalesced per origin (concurrent misses share one in-flight fetch) and SHOULD
 be gated by a minimum freshness floor (RECOMMENDED: 60 seconds) and use a conditional request
 (`If-None-Match` / `ETag`) where the origin supports one. Within the floor the cached list *is* the
-fresh read: a `keyId` missing from it is `contradicted` without another fetch. A refetch that fails
+fresh read: a `keyId` missing from it (and from any kept list) is `contradicted` without another fetch. A refetch that fails
 means the fresh read did not happen, so that miss is `unverifiable`, and the failed attempt is floored
 the same way, including a first fetch that fails. Without the floor an on-path intermediary injecting random `keyId`s into concurrent responses could force one key-list fetch per
 receipt. The floor bounds load only; it never moves a case between `unverifiable` and `contradicted`.
+
+**Kept key lists (last-known-good).** A listed binding never changes (§6.2), so an entry a verifier
+has fetched stays evidence for its `keyId` after the fetch. A verifier MAY keep the key lists it
+fetches from an origin, folded into one kept list per origin in which the first binding seen for a
+`keyId` wins, and MAY keep it after the origin stops resolving. A kept list establishes presence, never
+absence:
+
+- When the key list cannot be fetched, a receipt whose `keyId` (or, for a `/1` or `/2` receipt without
+  one, embedded `publicKey`) is in the kept list is evaluated against the kept entry under the rules
+  above. Any other receipt is `unverifiable`, as it would be without a kept list.
+- When a fetched list drops or rebinds a `keyId` that the kept list holds, the issuer has broken §6.2:
+  the origin changed hands, was compromised, or erred. The kept entry governs that `keyId`, and the
+  verifier MUST report the discontinuity with the result: `rebound` if the fetched list has that
+  `keyId` under another `alg` or `publicKey`, `dropped` if it lacks that `keyId`. A discontinuity shows
+  that two fetches disagree, not which one was honest: a verifier whose first fetch was itself tampered
+  with has pinned the wrong binding. What a consumer does with a result that carries a discontinuity is
+  its own policy.
+- A result that rests on a kept entry MUST be reported with the time that entry was last confirmed by
+  a fetch (`keptAt`, an RFC 3339 timestamp), so a consumer can tell a key confirmed today from one last seen before the
+  origin went away.
+
+A kept list is the verifier's own state, built only from lists it fetched itself from the origin it
+paid; a list obtained any other way (an archive, another verifier, a log) is outside this rule.
+Blocking the fetch gains an intermediary nothing it did not already have: against a kept entry the outcome is still fixed by
+the issuer's own key, and an absence the kept list cannot see stays `unverifiable`. GVP has no
+key-revocation mechanism (§7 revokes answers, not keys), so a kept entry withholds nothing a fresh
+fetch would have told the verifier.
+
+Without a kept list, an origin that stops resolving leaves every signed receipt it issued
+`unverifiable`, and one that changes hands and publishes a different list leaves them `contradicted`;
+a verifier with no history cannot tell either from the genuine case (the LIMIT cases in
+`vectors/attestation-kept.json`). That is deliberate: once nobody can speak for the origin, a verifier
+with no history has no basis for saying which key was the issuer's. Re-derivation (L1) never depended on the origin
+and keeps working.
 
 **Integrity-only verification.** A verifier without the key list MAY verify against an embedded
 `publicKey`, dispatching on that key's SPKI algorithm under the same rules (a `/3` receipt without
@@ -442,7 +479,8 @@ never a statement of issuer identity.
 *Rationale: `alg` inside the signed payload was raised by @0xsims (TenPrint, x402-foundation/x402#3234,
 2026-10-14) with the ML-DSA-65 use case; the point that signing `alg` is not enough, because the
 verifier must pick a primitive before it can check the signature, by @whawk46 the same day; the bounded
-refetch and the fixed ML-DSA-65 mode and context by @whawk46 on 2026-10-16.*
+refetch and the fixed ML-DSA-65 mode and context by @whawk46 on 2026-10-16; the case of an origin that
+stops resolving, which kept key lists answer, by @giskard09 (x402-foundation/x402#3304, 2026-10-21).*
 
 ## 7. Revocation (errata path)
 
@@ -474,7 +512,8 @@ canonical-hash fixtures. An implementation is **L1-conformant** iff it reproduce
 L2 conformance additionally requires reproducing the attestation vectors in `vectors/attestation.json`,
 `vectors/attestation-v2.json` and `vectors/attestation-v3.json` (sign-and-verify round trips and a
 cross-implementation verify), and reaching the expected outcome (§6.3) for every case in
-`vectors/attestation-outcomes.json`. A verifier that does not implement ML-DSA-65 MUST report
+`vectors/attestation-outcomes.json`. A verifier that keeps key lists MUST also reach the expected
+outcome, `keptAt` and discontinuity for every case in `vectors/attestation-kept.json`. A verifier that does not implement ML-DSA-65 MUST report
 `unverifiable` for the ML-DSA-65 cases, and is conformant in doing so. The suite MUST pass in at least two
 independent implementations; the repo ships JS (`ref/js`) and Python (`ref/py`) references that do.
 
@@ -526,5 +565,11 @@ remedy is a precondition on issuing a finding rather than another branch inside 
   signature is checked: the algorithm comes from the listed key, the key list from the origin the
   verifier paid, and a rewritten `keyId` or `alg` is `contradicted`, never `unverifiable` (§6.3).
   Key-list refetches are coalesced and floored so injected `keyId`s cannot become a fetch amplifier.
+- A kept key list lets a verifier keep verifying an origin that no longer resolves, and pins the
+  bindings it has seen, so a later controller of the domain cannot rebind a `keyId` without the
+  verifier noticing. It never turns an absence into `contradicted` (§6.3). It also pins whatever its
+  first fetch returned, so the key-list fetch SHOULD be made over HTTPS to the paid origin.
+- Key compromise is outside the key list: receipts under a leaked key remain issuance by the holder of
+  that key, and revocation (§7) is the remedy, per answer.
 - Revocation is the only sanctioned way to walk back an issued answer; keep it signed and append-only
   (§7) so it cannot itself be used to silently rewrite history.

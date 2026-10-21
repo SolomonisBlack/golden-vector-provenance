@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.12.0 — 2026-10-21 (unreleased until reviewed)
+**Kept key lists (last-known-good); no hash change, no payload change.** Answers @giskard09's question
+on x402-foundation/x402#3304: what happens to signed receipts when the issuer's origin stops resolving.
+
+- **Spec §6.2:** the key list is append-only. A `keyId`, once listed, MUST stay bound to the same `alg`
+  and `publicKey`.
+- **Spec §6.3, "Kept key lists":** a verifier MAY keep the key lists it has fetched from an origin (first
+  binding wins) and use them after the origin stops resolving. A kept list proves presence, never
+  absence. Origin unreachable and the key is kept → evaluated against the kept entry; not kept →
+  `unverifiable` as before. A fetched list that drops or rebinds a kept `keyId` → the kept entry governs
+  and the discontinuity (`dropped` / `rebound`, by the kept `keyId`) MUST be reported. Every result that
+  rests on a kept entry reports `keptAt` (RFC 3339).
+  Without a kept list, a dead origin still leaves its signed receipts `unverifiable`, by design.
+- **References:** `verifyAttestation(..., { kept })` (JS) and `verify_attestation(..., kept=)` (Python;
+  the result still unpacks as a 3-tuple, with `.info` for `keptAt` / `discontinuity`); `keepKeyList()`
+  / `keep_key_list()`; `createKeyListResolver()` keeps every successful fetch, exposes `kept(origin)`,
+  and accepts a persisted `keptSeed`.
+- **Spec §9:** the key-list fetch SHOULD be made over HTTPS (a kept list pins its first fetch); key
+  compromise is outside the key list, and §7 is the remedy per answer.
+- **Vectors:** `vectors/attestation-kept.json` (15 cases, Ed25519 only so it regenerates
+  byte-for-byte), including two LIMIT cases showing what a verifier with no history cannot detect.
+  The existing `/3` vectors and outcome table are unchanged. JS and Python: 0 failures.
+
 ## 0.11.0 — 2026-10-21 (unreleased until reviewed)
 **Signed-payload shape `GVP-Attestation/3`, ML-DSA-65, and key-first verification; no hash change.**
 Planned on x402-foundation/x402#3234 (2026-10-16) after review by 0xsims and whawk46.

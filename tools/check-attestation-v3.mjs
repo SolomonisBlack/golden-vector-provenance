@@ -8,11 +8,14 @@
 //   4. Key-list resolver (§6.3): refetch-once on a miss, coalesced per origin, gated by the freshness
 //      floor, conditional (ETag), and a failed refetch is unverifiable — with an injected-keyId flood
 //      producing exactly one fetch.
+//   5. vectors/attestation-kept.json — kept key lists (§6.3): a kept entry stands in for an unreachable
+//      origin and outranks a fetched list that dropped or rebound it, never proves absence, and every
+//      result resting on one reports keptAt (and the discontinuity); the resolver folds fetches into it.
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createPublicKey, verify as cVerify } from 'node:crypto';
-import { loadPrivateKey, attestationPayload, attest, verifyAttestation, createKeyListResolver,
+import { loadPrivateKey, attestationPayload, attest, verifyAttestation, createKeyListResolver, keepKeyList,
          ALG_ED25519, ALG_ML_DSA_65 } from '../ref/js/attest.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -108,6 +111,40 @@ const mk = (impl) => { const calls = []; return { calls, r: createKeyListResolve
   t = 62_000;
   ok('failed refetch is floored too', (await m.r.lookup('o', 'k2')) === null && m.calls.length === 2);
   ok('a cached hit still resolves while the origin is down', (await m.r.lookup('o', 'k1')) === listA);
+}
+
+// ---- 5. kept key lists ----
+const kp = read('attestation-kept.json');
+for (const c of kp.cases) {
+  const got = verifyAttestation(c.payload, c.signature, {
+    keyList: c.keyList === 'unreachable' ? null : kp.keyLists[c.keyList],
+    ...(c.kept ? { kept: kp.keptList } : {})
+  });
+  const want = `${c.expected}${c.keptAt ? ' keptAt=' + c.keptAt : ''}${c.discontinuity ? ' ' + c.discontinuity : ''}`;
+  const have = `${got.outcome}${got.keptAt ? ' keptAt=' + got.keptAt : ''}${got.discontinuity ? ' ' + got.discontinuity : ''}`;
+  ok(`kept: ${c.name.padEnd(62)} -> ${want}`, have === want && ('keptAt' in got) === ('keptAt' in c), `got ${have} (${got.reason})`);
+}
+{ // keepKeyList: first binding wins; lastSeenAt moves only for a binding that is confirmed again
+  const a = { keyId: 'k1', alg: ALG_ED25519, publicKey: 'A' };
+  const [T1, T2, T3] = ['2026-10-01T00:00:00.000Z', '2026-10-02T00:00:00.000Z', '2026-10-03T00:00:00.000Z'];
+  let k = keepKeyList(null, { keys: [a] }, T1);
+  k = keepKeyList(k, { keys: [{ ...a, publicKey: 'B' }, { keyId: 'k2', alg: ALG_ED25519, publicKey: 'C' }] }, T2);
+  ok('keepKeyList: a rebinding does not overwrite the kept entry', k.keys[0].publicKey === 'A' && k.keys[0].lastSeenAt === T1);
+  ok('keepKeyList: a new keyId is added', k.keys[1]?.keyId === 'k2' && k.keys[1].lastSeenAt === T2);
+  k = keepKeyList(k, { keys: [a] }, T3);
+  ok('keepKeyList: a confirmed binding updates lastSeenAt', k.keys[0].lastSeenAt === T3 && k.keys.length === 2);
+  ok('keepKeyList: lastSeenAt defaults to an RFC 3339 now', !Number.isNaN(Date.parse(keepKeyList(null, { keys: [a] }).keys[0].lastSeenAt)));
+}
+{ // resolver: the kept list survives a dead origin and a restart (seeded from persisted JSON)
+  const e1 = { keyId: 'k1', alg: ALG_ED25519, publicKey: 'A' };
+  t = 0; const m = mk((i) => i === 1 ? { list: { keys: [e1] }, etag: 'A' } : null);
+  await m.r.lookup('o', 'k1');
+  ok('resolver: a successful fetch is kept, with an RFC 3339 lastSeenAt', m.r.kept('o')?.keys[0]?.lastSeenAt === '1970-01-01T00:00:00.000Z');
+  const saved = JSON.parse(JSON.stringify({ o: m.r.kept('o') }));
+  const dead = createKeyListResolver({ now: clock, fetchList: async () => null, keptSeed: saved });
+  ok('resolver: after a restart with the origin gone, lookup is null', (await dead.lookup('o', 'k1')) === null);
+  ok('resolver: ...and the seeded kept list is still there', dead.kept('o')?.keys[0]?.keyId === 'k1');
+  ok('resolver: an unknown origin has no kept list', dead.kept('other') === null);
 }
 
 console.log(`\nAttestation /3: ${fails} failure(s)`);

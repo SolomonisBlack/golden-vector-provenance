@@ -1,6 +1,6 @@
 {
   "name": "golden-vector-provenance",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Reproducible provenance for computed answers: a canonical SHA-256 fixed point (RFC 8785 JCS) that anyone can re-derive for free, so you recompute the answer instead of trusting the server.",
   "keywords": [
     "provenance",
@@ -35,7 +35,8 @@
     "./middleware": "./middleware/index.mjs",
     "./vectors/attestation-v2": "./vectors/attestation-v2.json",
     "./vectors/attestation-v3": "./vectors/attestation-v3.json",
-    "./vectors/attestation-outcomes": "./vectors/attestation-outcomes.json"
+    "./vectors/attestation-outcomes": "./vectors/attestation-outcomes.json",
+    "./vectors/attestation-kept": "./vectors/attestation-kept.json"
   },
   "files": [
     "index.mjs",
@@ -74,7 +75,8 @@
     "verifier-precondition": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-fixedpoint-2.mjs",
     "check:plain-http": "node examples/plain-http/test.mjs",
     "check:l2v3": "node tools/check-attestation-v3.mjs",
-    "attestation:v3": "node tools/gen-attestation-v3.mjs"
+    "attestation:v3": "node tools/gen-attestation-v3.mjs",
+    "attestation:kept": "node tools/gen-attestation-kept.mjs"
   },
   "devDependencies": {
     "canonicalize": "^2.1.0"

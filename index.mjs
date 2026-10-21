@@ -17,6 +17,7 @@ export {
   verifyAttest,
   verifyAttestation,
   createKeyListResolver,
+  keepKeyList,
   algOfKey,
   ATTESTATION_V3,
   ALG_ED25519,

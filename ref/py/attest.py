@@ -8,6 +8,7 @@ expected key-first outcome (spec §6.3) for every case in vectors/attestation-ou
 """
 import json
 import base64
+from datetime import datetime, timezone
 import sys
 import os
 
@@ -134,73 +135,131 @@ def _load_spki(b64):
 _UNSET = object()
 
 
-def verify_attestation(p, sig, key_list=_UNSET, implemented=None):
-    """Key-first verification (spec §6.3) -> (outcome, reason, scope|None).
+class Outcome(tuple):
+    """(outcome, reason, scope) — unpacks as a 3-tuple; `info` carries keptAt / discontinuity when the
+    result rests on a kept key-list entry (spec §6.3, "Kept key lists")."""
+
+    def __new__(cls, outcome, reason, scope=None, info=None):
+        t = super().__new__(cls, (outcome, reason, scope))
+        t.info = dict(info or {})
+        return t
+
+
+def _same_binding(a, b):
+    """A keyId, once listed, stays bound to one alg and one key (spec §6.2)."""
+    return a.get("keyId") == b.get("keyId") and a.get("alg") == b.get("alg") and a.get("publicKey") == b.get("publicKey")
+
+
+def keep_key_list(kept, key_list, seen_at=None):
+    """Fold a successfully fetched key list into a kept list: first binding wins, and lastSeenAt records
+    the last fetch that confirmed it (RFC 3339; default now)."""
+    if seen_at is None:
+        seen_at = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    keys = [dict(k) for k in (kept or {}).get("keys", [])]
+    for k in (key_list or {}).get("keys", []):
+        if not isinstance(k.get("keyId"), str):
+            continue
+        prior = next((e for e in keys if e.get("keyId") == k["keyId"]), None)
+        if prior is None:
+            keys.append({"keyId": k["keyId"], "alg": k.get("alg"), "publicKey": k.get("publicKey"), "lastSeenAt": seen_at})
+        elif _same_binding(prior, k):
+            prior["lastSeenAt"] = seen_at
+    return {"keys": keys}
+
+
+def verify_attestation(p, sig, key_list=_UNSET, implemented=None, kept=None):
+    """Key-first verification (spec §6.3) -> Outcome(outcome, reason, scope|None).
 
     key_list: the issuer key list resolved from the origin the verifier paid; None = could not be
-    fetched; omitted = integrity-only check against the embedded publicKey."""
+    fetched; omitted = integrity-only check against the embedded publicKey.
+    kept: an optional kept key list (see keep_key_list) fetched from the same origin earlier; a result
+    that rests on a kept entry carries info["keptAt"], plus info["discontinuity"] ("dropped" |
+    "rebound") when the fetched list disagrees with it. Ignored in integrity-only mode (key_list
+    omitted)."""
     implemented = IMPLEMENTED_ALGS if implemented is None else implemented
     try:
         payload_string = attestation_payload(p)
     except PayloadError as e:
-        return (e.outcome, str(e), None)
+        return Outcome(e.outcome, str(e))
     except Exception as e:
-        return ("contradicted", str(e), None)
+        return Outcome("contradicted", str(e))
     is_v3 = p.get("payloadVersion") == ATTESTATION_V3
     if not isinstance(sig, dict):
-        return ("contradicted", "no signature object", None)
+        return Outcome("contradicted", "no signature object")
     if is_v3 and not sig.get("keyId"):
-        return ("contradicted", "%s requires keyId" % ATTESTATION_V3, None)
+        return Outcome("contradicted", "%s requires keyId" % ATTESTATION_V3)
 
     if key_list is _UNSET:  # integrity-only: dispatch on the embedded key
         if not sig.get("publicKey"):
-            return ("unverifiable", "no key list and no embedded publicKey", None)
+            return Outcome("unverifiable", "no key list and no embedded publicKey")
         try:
             key = _load_spki(sig["publicKey"])
         except UnsupportedAlgorithm:
-            return ("unverifiable", "embedded key type not implemented", None)
+            return Outcome("unverifiable", "embedded key type not implemented")
         except Exception:
-            return ("contradicted", "embedded publicKey is not SPKI DER", None)
+            return Outcome("contradicted", "embedded publicKey is not SPKI DER")
         alg = alg_of_key(key)
         if alg is None or alg not in implemented:
-            return ("unverifiable", "embedded key type not implemented: %s" % type(key).__name__, None)
+            return Outcome("unverifiable", "embedded key type not implemented: %s" % type(key).__name__)
         if signed_alg(p) != alg:
-            return ("contradicted", "signed alg %s != key alg %s" % (signed_alg(p), alg), None)
+            return Outcome("contradicted", "signed alg %s != key alg %s" % (signed_alg(p), alg))
         if _raw_verify(payload_string, key, sig.get("signature")):
-            return ("verified", "signature verifies under the embedded key", "integrity")
-        return ("contradicted", "signature does not verify", None)
+            return Outcome("verified", "signature verifies under the embedded key", "integrity")
+        return Outcome("contradicted", "signature does not verify")
 
-    if key_list is None:
-        return ("unverifiable", "key list unreachable", None)
     # By keyId; a /1 or /2 receipt without one (keyId was OPTIONAL there) is matched by its embedded
     # publicKey, the pre-/3 identity rule (spec §6.3).
-    keys = key_list.get("keys", [])
     key_id = sig.get("keyId")
-    if key_id:
-        entry = next((k for k in keys if isinstance(k.get("keyId"), str) and k["keyId"] == key_id), None)
-    elif sig.get("publicKey"):
-        entry = next((k for k in keys if k.get("publicKey") == sig["publicKey"]), None)
+
+    def find(lst):
+        keys = (lst or {}).get("keys", [])
+        if key_id:
+            return next((k for k in keys if isinstance(k.get("keyId"), str) and k["keyId"] == key_id), None)
+        if sig.get("publicKey"):
+            return next((k for k in keys if k.get("publicKey") == sig["publicKey"]), None)
+        return None
+
+    # A kept entry proves presence, never absence (spec §6.3, "Kept key lists").
+    kept_entry = find(kept)
+    info = {}
+    if key_list is None:
+        if kept_entry is None:
+            return Outcome("unverifiable", "key list unreachable; keyId not in kept list" if kept else "key list unreachable")
+        entry = kept_entry
+        info = {"keptAt": kept_entry.get("lastSeenAt")}
     else:
-        entry = None
-    if entry is None:
-        return ("contradicted", "keyId not in fetched key list: %s" % key_id if key_id
-                else "embedded publicKey not in fetched key list", None)
+        fetched = find(key_list)
+        if kept_entry is not None and not (fetched is not None and _same_binding(fetched, kept_entry)):
+            entry = kept_entry
+            # Classified by the kept entry's keyId, whichever way the receipt was matched (spec §6.3).
+            by_id = any(k.get("keyId") == kept_entry.get("keyId") for k in key_list.get("keys", []))
+            info = {"keptAt": kept_entry.get("lastSeenAt"), "discontinuity": "rebound" if by_id else "dropped"}
+        else:
+            entry = fetched
+        if entry is None:
+            return Outcome("contradicted", "keyId not in fetched key list: %s" % key_id if key_id
+                           else "embedded publicKey not in fetched key list")
+
+    def out(outcome, reason, scope=None):
+        return Outcome(outcome, reason, scope, info)
+
     # A mismatch is a contradiction whether or not this verifier implements either algorithm.
     if signed_alg(p) != entry.get("alg"):
-        return ("contradicted", "signed alg %s != key alg %s" % (signed_alg(p), entry.get("alg")), None)
+        return out("contradicted", "signed alg %s != key alg %s" % (signed_alg(p), entry.get("alg")))
     if entry.get("alg") not in implemented:
-        return ("unverifiable", "key alg not implemented: %s" % entry.get("alg"), None)
+        return out("unverifiable", "key alg not implemented: %s" % entry.get("alg"))
     try:
         key = _load_spki(entry["publicKey"])
     except Exception:
-        return ("contradicted", "listed publicKey is not SPKI DER", None)
+        return out("contradicted", "listed publicKey is not SPKI DER")
     if alg_of_key(key) != entry["alg"]:
-        return ("contradicted", "listed key type does not match its pinned alg %s" % entry["alg"], None)
+        return out("contradicted", "listed key type does not match its pinned alg %s" % entry["alg"])
     if sig.get("publicKey") and sig["publicKey"] != entry["publicKey"]:
-        return ("contradicted", "embedded publicKey differs from the listed key", None)
+        return out("contradicted", "embedded publicKey differs from the listed key")
     if _raw_verify(payload_string, key, sig.get("signature")):
-        return ("verified", "signature verifies under listed key %s" % entry.get("keyId", "(matched by publicKey)"), "identity")
-    return ("contradicted", "signature does not verify", None)
+        return out("verified", "signature verifies under %s key %s" % (
+            "kept" if "keptAt" in info else "listed", entry.get("keyId", "(matched by publicKey)")), "identity")
+    return out("contradicted", "signature does not verify")
 
 
 if __name__ == "__main__":
@@ -266,6 +325,23 @@ if __name__ == "__main__":
                 fails += 1
             print("%s %-52s -> %-12s %s" % ("ok  " if ok else "FAIL", c["name"], got[0],
                                              "" if ok else "(expected %s: %s)" % (want, got[1])))
+
+    # Kept key lists (spec §6.3)
+    fp = os.path.join(vdir, "attestation-kept.json")
+    if os.path.exists(fp):
+        with open(fp, encoding="utf-8") as fh:
+            kp = json.load(fh)
+        print("== attestation-kept.json")
+        for c in kp["cases"]:
+            total += 1
+            kl = None if c["keyList"] == "unreachable" else kp["keyLists"][c["keyList"]]
+            got = verify_attestation(c["payload"], c["signature"], kl, kept=kp["keptList"] if c["kept"] else None)
+            ok = (got[0] == c["expected"] and got.info.get("keptAt") == c.get("keptAt")
+                  and ("keptAt" in got.info) == ("keptAt" in c) and got.info.get("discontinuity") == c.get("discontinuity"))
+            if not ok:
+                fails += 1
+            print("%s %-62s -> %-12s %s" % ("ok  " if ok else "FAIL", c["name"], got[0],
+                                             "" if ok else "(expected %s %s: %s %s)" % (c["expected"], c.get("discontinuity"), got[1], got.info)))
 
     print("\n%d vectors, %d failures" % (total, fails))
     sys.exit(1 if fails else 0)

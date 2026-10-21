@@ -113,7 +113,11 @@ const result = (outcome, reason, scope) => ({ outcome, reason, ...(scope ? { sco
 //            origin it paid (spec §6.2); null = the list could not be fetched; undefined = integrity-only
 //            check against the receipt's embedded publicKey.
 //   implemented: the algorithms this verifier implements (default: both).
-export function verifyAttestation(payload, sig, { keyList, implemented = IMPLEMENTED_ALGS } = {}) {
+//   kept: an optional kept key list ({ keys: [{ keyId, alg, publicKey, lastSeenAt }] }, see keepKeyList)
+//         this verifier fetched from the same origin earlier. A result that rests on a kept entry carries
+//         keptAt, and `discontinuity` ('dropped' | 'rebound') when the fetched list disagrees with it.
+//         Ignored in integrity-only mode (keyList undefined).
+export function verifyAttestation(payload, sig, { keyList, kept, implemented = IMPLEMENTED_ALGS } = {}) {
   let payloadString;
   try { payloadString = attestationPayload(payload); }
   catch (e) { return result(e.outcome ?? 'contradicted', e.message); }
@@ -132,26 +136,62 @@ export function verifyAttestation(payload, sig, { keyList, implemented = IMPLEME
       : result('contradicted', 'signature does not verify');
   }
 
-  if (keyList === null) return result('unverifiable', 'key list unreachable');
   // By keyId; a /1 or /2 receipt without one (keyId was OPTIONAL there) is matched by its embedded
   // publicKey, the pre-/3 identity rule (spec §6.3).
-  const keys = keyList.keys ?? [];
   const keyId = sig.keyId;
-  const entry = keyId
-    ? keys.find(k => typeof k.keyId === 'string' && k.keyId === keyId)
-    : (sig.publicKey ? keys.find(k => k.publicKey === sig.publicKey) : undefined);
-  if (!entry) {
-    return result('contradicted', keyId ? `keyId not in fetched key list: ${keyId}` : 'embedded publicKey not in fetched key list');
+  const find = list => {
+    const keys = list?.keys ?? [];
+    return keyId
+      ? keys.find(k => typeof k.keyId === 'string' && k.keyId === keyId)
+      : (sig.publicKey ? keys.find(k => k.publicKey === sig.publicKey) : undefined);
+  };
+  // A kept entry (spec §6.3, "Kept key lists") proves presence, never absence: it can stand in for an
+  // unreachable origin, and it outranks a fetched list that dropped or rebound it, but a keyId missing
+  // from a kept list says nothing.
+  const keptEntry = find(kept);
+  let entry, info = {};
+  if (keyList === null) {
+    if (!keptEntry) return result('unverifiable', kept ? 'key list unreachable; keyId not in kept list' : 'key list unreachable');
+    entry = keptEntry;
+    info = { keptAt: keptEntry.lastSeenAt ?? null };
+  } else {
+    const fetched = find(keyList);
+    if (keptEntry && !(fetched && sameBinding(fetched, keptEntry))) {
+      entry = keptEntry;
+      // Classified by the kept entry's keyId, whichever way the receipt was matched (spec §6.3).
+      const byId = (keyList.keys ?? []).some(k => k.keyId === keptEntry.keyId);
+      info = { keptAt: keptEntry.lastSeenAt ?? null, discontinuity: byId ? 'rebound' : 'dropped' };
+    } else entry = fetched;
+    if (!entry) {
+      return result('contradicted', keyId ? `keyId not in fetched key list: ${keyId}` : 'embedded publicKey not in fetched key list');
+    }
   }
+  const out = (outcome, reason, scope) => ({ ...result(outcome, reason, scope), ...info });
   // A mismatch is a contradiction whether or not this verifier implements either algorithm.
-  if (signedAlg(payload) !== entry.alg) return result('contradicted', `signed alg ${signedAlg(payload)} != key alg ${entry.alg}`);
-  if (!implemented.includes(entry.alg)) return result('unverifiable', `key alg not implemented: ${entry.alg}`);
-  let key; try { key = spkiKey(entry.publicKey); } catch { return result('contradicted', 'listed publicKey is not SPKI DER'); }
-  if (algOfKey(key) !== entry.alg) return result('contradicted', `listed key type does not match its pinned alg ${entry.alg}`);
-  if (sig.publicKey && sig.publicKey !== entry.publicKey) return result('contradicted', 'embedded publicKey differs from the listed key');
+  if (signedAlg(payload) !== entry.alg) return out('contradicted', `signed alg ${signedAlg(payload)} != key alg ${entry.alg}`);
+  if (!implemented.includes(entry.alg)) return out('unverifiable', `key alg not implemented: ${entry.alg}`);
+  let key; try { key = spkiKey(entry.publicKey); } catch { return out('contradicted', 'listed publicKey is not SPKI DER'); }
+  if (algOfKey(key) !== entry.alg) return out('contradicted', `listed key type does not match its pinned alg ${entry.alg}`);
+  if (sig.publicKey && sig.publicKey !== entry.publicKey) return out('contradicted', 'embedded publicKey differs from the listed key');
   return rawVerify(payloadString, key, sig.signature)
-    ? result('verified', `signature verifies under listed key ${entry.keyId ?? '(matched by publicKey)'}`, 'identity')
-    : result('contradicted', 'signature does not verify');
+    ? out('verified', `signature verifies under ${'keptAt' in info ? 'kept' : 'listed'} key ${entry.keyId ?? '(matched by publicKey)'}`, 'identity')
+    : out('contradicted', 'signature does not verify');
+}
+
+// A keyId, once listed, stays bound to one alg and one key (spec §6.2).
+const sameBinding = (a, b) => a.keyId === b.keyId && a.alg === b.alg && a.publicKey === b.publicKey;
+
+// Fold a successfully fetched key list into a kept list: first binding wins (a later list that drops or
+// rebinds a keyId does not overwrite it), and lastSeenAt records the last fetch that confirmed it.
+export function keepKeyList(kept, list, seenAt = new Date().toISOString()) {
+  const keys = (kept?.keys ?? []).map(k => ({ ...k }));
+  for (const k of list?.keys ?? []) {
+    if (typeof k.keyId !== 'string') continue;
+    const prior = keys.find(e => e.keyId === k.keyId);
+    if (!prior) keys.push({ keyId: k.keyId, alg: k.alg, publicKey: k.publicKey, lastSeenAt: seenAt });
+    else if (sameBinding(prior, k)) prior.lastSeenAt = seenAt;
+  }
+  return { keys };
 }
 
 // Key-list resolver with the bounded refetch of spec §6.3. `fetchList(origin, etag)` returns
@@ -163,11 +203,16 @@ export function verifyAttestation(payload, sig, { keyList, implemented = IMPLEME
 //   - concurrent refetches for one origin share a single in-flight fetch (coalesced)
 //   - a refetch that fails means the fresh read did not happen: the miss is `unverifiable` (null), and
 //     the failure is floored too, so a down origin is not hammered either
-export function createKeyListResolver({ fetchList, minRefetchMs = 60_000, now = () => Date.now() }) {
+// kept(origin) -> the kept key list for that origin (pass it to verifyAttestation as `kept`), folded from
+// every successful fetch by keepKeyList; it is plain JSON, so a caller can persist it and hand it back
+// through `keptSeed` ({ [origin]: keptList }) after a restart.
+export function createKeyListResolver({ fetchList, minRefetchMs = 60_000, now = () => Date.now(), keptSeed = {} }) {
   // origin -> { list, etag, fetchedAt, failedAt? }; list is null for an origin never fetched successfully
   // (a cold failure is cached too, so it is floored like any other)
   const cache = new Map();
   const inflight = new Map();   // origin -> Promise<entry|null>
+  const keptBy = new Map(Object.entries(keptSeed));   // origin -> kept key list
+  const iso = ms => new Date(ms).toISOString();
 
   function refresh(origin) {
     if (inflight.has(origin)) return inflight.get(origin);
@@ -175,7 +220,11 @@ export function createKeyListResolver({ fetchList, minRefetchMs = 60_000, now = 
     const p = (async () => {
       let res;
       try { res = await fetchList(origin, prev?.etag); } catch { res = null; }
-      if (res?.notModified && prev?.list) { prev.fetchedAt = now(); delete prev.failedAt; return prev; }
+      if (res?.notModified && prev?.list) {
+        prev.fetchedAt = now(); delete prev.failedAt;
+        keptBy.set(origin, keepKeyList(keptBy.get(origin), prev.list, iso(prev.fetchedAt)));
+        return prev;
+      }
       if (!res || !res.list) {
         if (prev) prev.failedAt = now();
         else cache.set(origin, { list: null, fetchedAt: -Infinity, failedAt: now() });
@@ -183,6 +232,7 @@ export function createKeyListResolver({ fetchList, minRefetchMs = 60_000, now = 
       }
       const entry = { list: res.list, etag: res.etag, fetchedAt: now() };
       cache.set(origin, entry);
+      keptBy.set(origin, keepKeyList(keptBy.get(origin), res.list, iso(entry.fetchedAt)));
       return entry;
     })().finally(() => inflight.delete(origin));
     inflight.set(origin, p);
@@ -200,6 +250,7 @@ export function createKeyListResolver({ fetchList, minRefetchMs = 60_000, now = 
       }
       const fresh = await refresh(origin);
       return fresh ? fresh.list : null;
-    }
+    },
+    kept(origin) { return keptBy.get(origin) ?? null; }
   };
 }

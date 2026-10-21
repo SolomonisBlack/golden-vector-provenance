@@ -214,7 +214,7 @@ escaping non-ASCII). This repo proves all of it empirically before relying on th
 ```bash
 npm install
 npm test                                       # L1 hashes + L2 signatures + the JCS gate
-node tools/check-attestation-v3.mjs            # /3: Ed25519 + ML-DSA-65 vectors, key-first outcomes, key-list refetch bound
+node tools/check-attestation-v3.mjs            # /3: Ed25519 + ML-DSA-65 vectors, key-first outcomes, key-list refetch bound, kept key lists
 
 node tools/check-js.mjs                        # JS: reproduce L1 hashes + verify L2 signatures
 node tools/check-jcs.mjs                       # JS canonicalization vs an INDEPENDENT RFC 8785 impl
@@ -310,7 +310,7 @@ schema/receipt.schema.json    JSON Schema (draft 2020-12) for a Verification Rec
 schema/revocation-list.schema.json  JSON Schema for the signed, append-only revocation list
 index.mjs                     package entry point (re-exports L1 + L2)
 ref/js/gvp.mjs                JS reference: canonicalize() + gvpHash()  (L1)
-ref/js/attest.mjs             JS reference: attest()/verifyAttestation()/createKeyListResolver(), Ed25519 + ML-DSA-65 (L2)
+ref/js/attest.mjs             JS reference: attest()/verifyAttestation()/createKeyListResolver()/keepKeyList(), Ed25519 + ML-DSA-65 (L2)
 ref/py/gvp.py                 Python reference: canonicalize() + gvp_hash() + a vectors runner (L1)
 ref/py/attest.py              Python reference: attest/verify_attestation, Ed25519 + ML-DSA-65 + cross-lang proof (L2)
 vectors/                      conformance vectors + generated expected.json / attestation.json
@@ -319,7 +319,8 @@ tools/check-jcs.mjs           RFC 8785 equivalence gate (vs an independent imple
 tools/gen-vectors.mjs         generate L1 hashes (optional GVP_CALC_CORE cross-check vs a 2nd impl)
 tools/gen-attestation.mjs     generate L2 attestation vectors (/1, /2) with the fixed test key
 tools/gen-attestation-v3.mjs  generate the /3 vectors (Ed25519 + ML-DSA-65) and the key-first outcome table
-tools/check-attestation-v3.mjs  /3 check: vectors, outcomes (verified / unverifiable / contradicted), refetch bound
+tools/gen-attestation-kept.mjs  generate the kept-key-list outcome table (Ed25519, deterministic)
+tools/check-attestation-v3.mjs  /3 check: vectors, outcomes (verified / unverifiable / contradicted), refetch bound, kept lists
 docs/RECOMPUTE-NOT-TRUST.md   category note: the five trust models and where GVP sits
 docs/REGULATORY-BRIDGE.md     GVP artifacts mapped to EU AI Act / ISO 42001 / NIST AI RMF evidence classes
 docs/COMPLIANCE-MEMO-ART50-ART12.md  one-page memo for audit/compliance vendors: Art. 50(2) + Art. 12 fit and boundary

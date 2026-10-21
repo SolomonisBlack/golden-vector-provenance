@@ -1,0 +1,414 @@
+{
+  "spec": "spec/gvp-0.2.md §6.3 (Kept key lists)",
+  "note": "keyList names one of keyLists (fetched from the origin the verifier paid) or \"unreachable\"; kept: true passes keptList as the verifier's kept list. keptAt / discontinuity, when present, MUST be reported with the outcome; when absent, the result does not rest on a kept entry. LIMIT cases show what a verifier with no history cannot detect.",
+  "keptList": {
+    "keys": [
+      {
+        "keyId": "gvp-test-ed25519-1",
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "lastSeenAt": "2026-10-01T00:00:00.000Z"
+      }
+    ]
+  },
+  "keyLists": {
+    "current": {
+      "issuer": "gvp.example",
+      "keys": [
+        {
+          "keyId": "gvp-test-ed25519-1",
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM="
+        }
+      ]
+    },
+    "rotated": {
+      "issuer": "gvp.example",
+      "keys": [
+        {
+          "keyId": "gvp-test-ed25519-1",
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM="
+        },
+        {
+          "keyId": "gvp-test-ed25519-2",
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEAYf6WwJcsNh2EbRK0dDTWmBzncj48CHgPesMMIF7l/a0="
+        }
+      ]
+    },
+    "dropped": {
+      "issuer": "gvp.example",
+      "keys": [
+        {
+          "keyId": "gvp-test-ed25519-2",
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEAYf6WwJcsNh2EbRK0dDTWmBzncj48CHgPesMMIF7l/a0="
+        }
+      ]
+    },
+    "rebound": {
+      "issuer": "gvp.example",
+      "keys": [
+        {
+          "keyId": "gvp-test-ed25519-1",
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEAYf6WwJcsNh2EbRK0dDTWmBzncj48CHgPesMMIF7l/a0="
+        }
+      ]
+    },
+    "renamed": {
+      "issuer": "gvp.example",
+      "keys": [
+        {
+          "keyId": "gvp-test-ed25519-renamed",
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM="
+        }
+      ]
+    }
+  },
+  "cases": [
+    {
+      "name": "origin unreachable, keyId in kept list",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "unreachable",
+      "kept": true,
+      "expected": "verified",
+      "keptAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "name": "origin unreachable, keyId not in kept list",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-2",
+        "signature": "S6YUz9rMgxaFVz75TZ5QFTh+hVTQWQAHjqGdNIL4PIPnvvFEfBCrIAYTcPIchOzbQvKN3ZG1DbZtpQOLc3RSDA=="
+      },
+      "keyList": "unreachable",
+      "kept": true,
+      "expected": "unverifiable"
+    },
+    {
+      "name": "origin unreachable, no kept list",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "unreachable",
+      "kept": false,
+      "expected": "unverifiable"
+    },
+    {
+      "name": "origin unreachable, kept key, responseHash tampered",
+      "payload": {
+        "responseHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "unreachable",
+      "kept": true,
+      "expected": "contradicted",
+      "keptAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "name": "origin unreachable, kept key, signed alg rewritten",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "ML-DSA-65"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "unreachable",
+      "kept": true,
+      "expected": "contradicted",
+      "keptAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "name": "origin unreachable, v2 receipt without keyId, key in kept list",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/2",
+        "fixedPointVersion": "GVP-FixedPoint/1"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "en1/DJ22ZW2LtgvkVkZQcCDqWsi6VT5sHaMdO/MQ7EKSH4B4IK9j2ufrFwV4b4uypgtC1ni0AnyxvqypUGc0Ag=="
+      },
+      "keyList": "unreachable",
+      "kept": true,
+      "expected": "verified",
+      "keptAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "name": "fetched list agrees with kept list",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "current",
+      "kept": true,
+      "expected": "verified"
+    },
+    {
+      "name": "fetched list adds a keyId the kept list lacks",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-2",
+        "signature": "S6YUz9rMgxaFVz75TZ5QFTh+hVTQWQAHjqGdNIL4PIPnvvFEfBCrIAYTcPIchOzbQvKN3ZG1DbZtpQOLc3RSDA=="
+      },
+      "keyList": "rotated",
+      "kept": true,
+      "expected": "verified"
+    },
+    {
+      "name": "fetched list dropped a kept keyId",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "dropped",
+      "kept": true,
+      "expected": "verified",
+      "keptAt": "2026-10-01T00:00:00.000Z",
+      "discontinuity": "dropped"
+    },
+    {
+      "name": "fetched list rebound a kept keyId, original receipt",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "rebound",
+      "kept": true,
+      "expected": "verified",
+      "keptAt": "2026-10-01T00:00:00.000Z",
+      "discontinuity": "rebound"
+    },
+    {
+      "name": "fetched list rebound a kept keyId, receipt under the new binding",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "S6YUz9rMgxaFVz75TZ5QFTh+hVTQWQAHjqGdNIL4PIPnvvFEfBCrIAYTcPIchOzbQvKN3ZG1DbZtpQOLc3RSDA=="
+      },
+      "keyList": "rebound",
+      "kept": true,
+      "expected": "contradicted",
+      "keptAt": "2026-10-01T00:00:00.000Z",
+      "discontinuity": "rebound"
+    },
+    {
+      "name": "v2 receipt without keyId, fetched list rebound its kept keyId",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/2",
+        "fixedPointVersion": "GVP-FixedPoint/1"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "en1/DJ22ZW2LtgvkVkZQcCDqWsi6VT5sHaMdO/MQ7EKSH4B4IK9j2ufrFwV4b4uypgtC1ni0AnyxvqypUGc0Ag=="
+      },
+      "keyList": "rebound",
+      "kept": true,
+      "expected": "verified",
+      "keptAt": "2026-10-01T00:00:00.000Z",
+      "discontinuity": "rebound"
+    },
+    {
+      "name": "v2 receipt without keyId, fetched list moved its key to a new keyId",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/2",
+        "fixedPointVersion": "GVP-FixedPoint/1"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "en1/DJ22ZW2LtgvkVkZQcCDqWsi6VT5sHaMdO/MQ7EKSH4B4IK9j2ufrFwV4b4uypgtC1ni0AnyxvqypUGc0Ag=="
+      },
+      "keyList": "renamed",
+      "kept": true,
+      "expected": "verified",
+      "keptAt": "2026-10-01T00:00:00.000Z",
+      "discontinuity": "dropped"
+    },
+    {
+      "name": "LIMIT: same rebinding, verifier with no kept list",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "S6YUz9rMgxaFVz75TZ5QFTh+hVTQWQAHjqGdNIL4PIPnvvFEfBCrIAYTcPIchOzbQvKN3ZG1DbZtpQOLc3RSDA=="
+      },
+      "keyList": "rebound",
+      "kept": false,
+      "expected": "verified"
+    },
+    {
+      "name": "LIMIT: dropped keyId, verifier with no kept list",
+      "payload": {
+        "responseHash": "sha256:94f78e0d472e97db6b590f1b54e778d6065d7a18e5a3d2a324b17adb48a6e771",
+        "endpoint": "/v1/self-employment-tax",
+        "dataVintage": "2026.0",
+        "issuer": "gvp.example",
+        "agentId": "59110",
+        "issuedAt": "2026-10-21T00:00:00.000Z",
+        "payloadVersion": "GVP-Attestation/3",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "alg": "Ed25519"
+      },
+      "signature": {
+        "alg": "Ed25519",
+        "keyId": "gvp-test-ed25519-1",
+        "signature": "Sc3N2Vc2noKCHv56kOvEud6cDVv+rDExoOGSZAUSWqRAIanP/W+Wlnf3jSgBjLMmbMBfqZDttDjQ2Pmwl6GPCQ=="
+      },
+      "keyList": "dropped",
+      "kept": false,
+      "expected": "contradicted"
+    }
+  ]
+}
