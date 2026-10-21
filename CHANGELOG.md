@@ -21,6 +21,10 @@
   instrument failed" may be byte-identical. Held to their companion rule: the detector reproduces a
   known answer in `audit/test.mjs` (their described corpus shape: a sibling boolean disambiguates; the
   same string without one is flagged) or its run is void.
+- **`docs/CARRIAGE-PROFILES.md` C3: the vocabulary names `/1` and `/2`** (said "currently only
+  `GVP-FixedPoint/1`" while §2.1.3 already defined `/2`, so a verifier following it would reject a valid
+  `/2` value). Now the explicit set, matching the schema enum, plus the §2.1.1 rule for an unknown
+  identifier. Reported by the asqav-registry reviewer on jagmarques/asqav-registry#10 (2026-10-20).
 - README: fourth independent reproduction of the normative worked vector recorded (goun7, separate
   RFC 8785 implementation, 134 bytes / `81ea1f22…`; re-run here from a clean clone the same day).
 

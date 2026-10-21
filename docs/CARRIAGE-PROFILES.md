@@ -49,9 +49,14 @@ fields, GVP defines one extension field:
 |---|---|---|
 | `response_provenance` | **signed-payload** | object `{ "responseHash": "sha256:<64 hex>", "fixedPointVersion": "<rule-set id>" }` |
 
-Vocabulary: `responseHash` MUST match `^sha256:[0-9a-f]{64}$`; `fixedPointVersion` MUST be a
-registered GVP rule-set identifier, currently only `"GVP-FixedPoint/1"` ([§2.1.1](../spec/gvp-0.2.md)).
-An independent verifier validates the two values syntactically without any GVP code; a verifier that
+Vocabulary: `responseHash` MUST match `^sha256:[0-9a-f]{64}$`; `fixedPointVersion` MUST be one of the
+GVP rule-set identifiers, currently exactly `{"GVP-FixedPoint/1", "GVP-FixedPoint/2"}` (`/1`:
+[§2.1.1](../spec/gvp-0.2.md); `/2`: [§2.1.3](../spec/gvp-0.2.md), vectors in
+[`vectors/expected-v2.json`](../vectors/expected-v2.json); the same set as the `fixedPointVersion` enum
+in [`receipt.schema.json`](../schema/receipt.schema.json)). The set only grows: a frozen identifier is
+never edited, and a new one is listed here with its own conformance vectors. A verifier that meets an
+identifier outside the set it implements MUST report **"unsupported fixed-point rule set"**
+([§2.1.1](../spec/gvp-0.2.md)), never a hash mismatch or forgery. An independent verifier validates the two values syntactically without any GVP code; a verifier that
 also holds the response body and the request inputs recomputes the hash per [§3](../spec/gvp-0.2.md)
 and MUST treat a mismatch as a non-conformance of the receipt, not of the verifier.
 
