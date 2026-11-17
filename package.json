@@ -60,10 +60,11 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-attestation-v3.mjs && node tools/check-fixedpoint-2.mjs && node tools/check-hash-count.mjs && node tools/check-refusal-drift.mjs && node middleware/test.mjs && node examples/plain-http/test.mjs && node audit/test.mjs",
+    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-attestation-v3.mjs && node tools/check-fixedpoint-2.mjs && node tools/check-hash-count.mjs && node tools/check-refusal-drift.mjs && node tools/check-refusal-roundtrip.mjs && node middleware/test.mjs && node examples/plain-http/test.mjs && node audit/test.mjs",
     "check:audit": "node audit/test.mjs",
     "check:hash-count": "node tools/check-hash-count.mjs",
     "check:refusal-drift": "node tools/check-refusal-drift.mjs",
+    "check:refusal-roundtrip": "node tools/check-refusal-roundtrip.mjs",
     "check:l1l2": "node tools/check-js.mjs",
     "check:jcs": "node tools/check-jcs.mjs",
     "vectors": "node tools/gen-vectors.mjs",
