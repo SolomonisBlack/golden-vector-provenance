@@ -33,6 +33,7 @@
     "./vectors": "./vectors/expected.json",
     "./package.json": "./package.json",
     "./middleware": "./middleware/index.mjs",
+    "./audit": "./audit/lib/report.mjs",
     "./vectors/attestation-v2": "./vectors/attestation-v2.json",
     "./vectors/attestation-v3": "./vectors/attestation-v3.json",
     "./vectors/attestation-outcomes": "./vectors/attestation-outcomes.json",
@@ -57,7 +58,9 @@
     "audit/lib/",
     "audit/README.md",
     "docs/REFUSALS.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "!tools/**/node_modules",
+    "!tools/**/package-lock.json"
   ],
   "scripts": {
     "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-attestation-v3.mjs && node tools/check-fixedpoint-2.mjs && node tools/check-hash-count.mjs && node tools/check-refusal-drift.mjs && node tools/check-refusal-roundtrip.mjs && node middleware/test.mjs && node examples/plain-http/test.mjs && node audit/test.mjs",

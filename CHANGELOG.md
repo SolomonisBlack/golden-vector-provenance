@@ -1,8 +1,15 @@
 # Changelog
 
-## 0.12.0 — 2026-10-21 (unreleased until reviewed)
+## 0.12.0 — 2026-10-21; npm release 2026-11-18 (includes 0.11.0, which had no npm release of its own)
 **Kept key lists (last-known-good); no hash change, no payload change.** Answers @giskard09's question
 on x402-foundation/x402#3304: what happens to signed receipts when the issuer's origin stops resolving.
+
+- **New export `golden-vector-provenance/audit`:** the `gvp-audit` engine (`auditRoute`, `safeAuditRoute`, `summarize`, `toMarkdown`) for programs that audit bodies in process instead of through the CLI. No behaviour change.
+- **Outside contributions in this release (tools and vectors only, no runtime change):**
+  `tools/check-refusal-roundtrip.mjs` by goun7 (PR #3): every refusal listed in `docs/REFUSALS.md` must
+  round-trip against a throw in the code, now part of `npm test`. `tools/tenprint-mldsa65/` by 0xsims
+  (PR #4): the `/3` ML-DSA-65 vectors re-signed and verified with `@noble/post-quantum` 0.3.0, run with
+  `npm install && npm run check` in that folder (it has its own dev dependency).
 
 - **Spec §6.2:** the key list is append-only. A `keyId`, once listed, MUST stay bound to the same `alg`
   and `publicKey`.
@@ -23,7 +30,7 @@ on x402-foundation/x402#3304: what happens to signed receipts when the issuer's 
   byte-for-byte), including two LIMIT cases showing what a verifier with no history cannot detect.
   The existing `/3` vectors and outcome table are unchanged. JS and Python: 0 failures.
 
-## 0.11.0 — 2026-10-21 (unreleased until reviewed)
+## 0.11.0 — 2026-10-21 (no npm release of its own; shipped in 0.12.0)
 **Signed-payload shape `GVP-Attestation/3`, ML-DSA-65, and key-first verification; no hash change.**
 Planned on x402-foundation/x402#3234 (2026-10-16) after review by 0xsims and whawk46.
 
@@ -54,7 +61,7 @@ Planned on x402-foundation/x402#3234 (2026-10-16) after review by 0xsims and wha
 - `tools/check-attestation-v3.mjs` (in `npm test`), `tools/gen-attestation-v3.mjs`; schema
   `signature` accepts `/3` (`keyId` required there, `alg` ∈ {Ed25519, ML-DSA-65}).
 
-## 0.10.0 — 2026-09-19 (unreleased until reviewed)
+## 0.10.0 — 2026-09-19; npm release 2026-09-20
 **Two reviewer-filed fixes, one reviewer-proposed audit class; no hash change.**
 
 - **`schema/receipt.schema.json`: `fixedPointVersion` is an enum of `/1` and `/2`** (was a `const` of
