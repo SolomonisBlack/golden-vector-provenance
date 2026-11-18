@@ -2,44 +2,126 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gvp.example/schema/revocation-list-0.2.json",
   "title": "GVP Revocation List",
-  "description": "A signed, append-only list of revoked receipt hashes — the GVP errata path (spec §7). Since a reproducible answer stays reproducibly wrong once issued, this is the only sanctioned way to walk one back.",
+  "description": "A signed, append-only list of revoked hashes: the GVP errata path (spec §7). Since a reproducible answer stays reproducibly wrong once issued, this is the only sanctioned way to walk one back. Served at /.well-known/gvp-revocations.json on the origin the verifier paid, signed by a key in that origin's /.well-known/gvp-keys.json. An empty signed list is valid and means nothing is revoked.",
   "type": "object",
-  "required": ["revocationListVersion", "issuer", "updatedAt", "revoked"],
+  "required": [
+    "revocationListVersion",
+    "issuer",
+    "updatedAt",
+    "revoked"
+  ],
   "additionalProperties": true,
   "properties": {
-    "revocationListVersion": { "const": "GVP-Revocation/0.2" },
-    "issuer": { "type": "string", "description": "issuer service identifier (matches the receipt's issuer.service)" },
-    "updatedAt": { "type": "string", "format": "date-time" },
+    "revocationListVersion": {
+      "const": "GVP-Revocation/0.2"
+    },
+    "issuer": {
+      "type": "string",
+      "description": "issuer service identifier: equals the issuer member the issuer signs (a receipt's issuer.service) and the key list's issuer"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "time of the last change to `revoked`; MUST NOT move backwards between fetches"
+    },
     "revoked": {
       "type": "array",
       "items": {
-        "type": "object",
-        "required": ["responseHash", "reason", "revokedAt"],
-        "properties": {
-          "responseHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
-          "reason": { "type": "string" },
-          "revokedAt": { "type": "string", "format": "date-time" },
-          "supersededBy": {
-            "oneOf": [
-              { "type": "null" },
-              { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "description": "the responseHash of the corrected answer, if any" }
-            ]
+        "anyOf": [
+          {
+            "type": "object",
+            "description": "a revoked receipt answer (kind absent or \"responseHash\")",
+            "required": [
+              "responseHash",
+              "reason",
+              "revokedAt"
+            ],
+            "properties": {
+              "kind": {
+                "const": "responseHash"
+              },
+              "responseHash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "revokedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "supersededBy": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "description": "the responseHash of the corrected answer, if any"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "a revoked signed report, by its reportHash",
+            "required": [
+              "kind",
+              "reportHash",
+              "reason",
+              "revokedAt"
+            ],
+            "properties": {
+              "kind": {
+                "const": "reportHash"
+              },
+              "reportHash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "revokedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
           }
-        }
+        ]
       }
     },
     "signature": {
       "oneOf": [
-        { "type": "null" },
+        {
+          "type": "null"
+        },
         {
           "type": "object",
-          "required": ["alg", "publicKey", "signature"],
+          "required": [
+            "alg",
+            "publicKey",
+            "signature"
+          ],
           "properties": {
-            "alg": { "const": "Ed25519" },
-            "publicKey": { "type": "string" },
-            "signature": { "type": "string" },
-            "keyId": { "type": "string" }
-          }
+            "alg": {
+              "const": "Ed25519"
+            },
+            "publicKey": {
+              "type": "string"
+            },
+            "signature": {
+              "type": "string"
+            },
+            "keyId": {
+              "type": "string",
+              "description": "Key-id in the issuer key list (spec §6.2); the verifier takes the key and its alg from the list (spec §6.3)"
+            }
+          },
+          "description": "Signature over the canonical JSON (spec §2.2) of this document with the signature member removed (spec §7)"
         }
       ]
     }

@@ -1,0 +1,1745 @@
+{
+  "description": "GVP receipt vectors (spec §6.4, §5, §7). Ed25519 cases regenerate byte for byte; the ML-DSA-65 case is verify-only (hedged signature). Each case is a FULL receipt. A conformant verifier rebuilds the payload by the §6.4 table, reproduces expectedPayload byte for byte (null = the table refuses to build one), reaches `expected` (§6.3), and recomputes responseHash (§5) to match responseHashRederives. keyList: \"published\" = keyList below, \"live\" = liveKeyList, \"none\" = integrity-only.",
+  "key": "vectors/attestation-key.json (throwaway test key, NOT a production key)",
+  "keyList": {
+    "issuer": "issuer.example",
+    "keys": [
+      {
+        "keyId": "issuer-example-ed25519-1",
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM="
+      },
+      {
+        "keyId": "issuer-example-mldsa65-1",
+        "alg": "ML-DSA-65",
+        "publicKey": "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"
+      }
+    ]
+  },
+  "liveKeyList": {
+    "issuer": "x402toll.com",
+    "keys": [
+      {
+        "keyId": "x402toll-ed25519-5e57c914572251f2",
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEAii2LYVNURyAu/bi2LUSmjQBdrRPL6xt/+nI7gSnU950="
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "v1-legacy-matched-by-publicKey",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "KOvZAVQW3MwtIUKgohLFZ4POSmAL4BAkF7Dfmoql7t++lq/8dHIn/QMw+v7EbGgsKjjYGkAygRFcWPQr6i8OCg==",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "No payloadVersion: shape /1, no fixedPointVersion member signed, no keyId (matched by embedded publicKey)."
+    },
+    {
+      "name": "v2-fixedpoint-1",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "aO7J4DcW1uwvHWtLMhh4oVPELXoielDzv5ug6VqkbZ3uA5eaWQWPkma78689Jek+Om6a/6eSFpKq6ODzsgnOCw==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/1\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}"
+    },
+    {
+      "name": "v2-fixedpoint-2",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "The shape x402toll.com issues today: /2 signing GVP-FixedPoint/2."
+    },
+    {
+      "name": "v2-anchor-null",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": null,
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ak2dJrY4Hv8tuceaJ71YPQilvK/YGRIJVFNNo/SqN6muiP+I6HuqHDbCde800fVh93afsgYkP0MiZYSHVaX7Dg==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":null,\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "onChainAnchor null: agentId is JSON null in the payload."
+    },
+    {
+      "name": "v2-anchor-absent",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ak2dJrY4Hv8tuceaJ71YPQilvK/YGRIJVFNNo/SqN6muiP+I6HuqHDbCde800fVh93afsgYkP0MiZYSHVaX7Dg==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":null,\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "No onChainAnchor member: agentId is JSON null in the payload."
+    },
+    {
+      "name": "v3-ed25519",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "1vv4FhHFOkLRbbMs6ZvrHInW+fiOA6zmpDzdNWwhjnAbVhQJ9PMVlcs2gs9nRjgkHF6m5BLe+aQodvDjuxSJAg==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/3",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"alg\":\"Ed25519\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/3\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "/3 signs alg, read from signature.alg."
+    },
+    {
+      "name": "v3-ml-dsa-65",
+      "keyList": "published",
+      "requires": "ML-DSA-65",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "ML-DSA-65",
+          "publicKey": "MIIHsjALBglghkgBZQMEAxIDggehAKsZnzOeaTKUyol5vUsHkO3gQwJkiLY8Znf+Dgk1123Is2N9CnTo03V6zX7MBnT3n4du9ZumGVJHFqO4ydMl+39P1suoJHecM19oEcQyux9yIDnokYKmYd45aEhmpBS48hYk80gzWgStIY/IF3WIU2HhTbPVoFu+JAQU/hYcuJb7snETID3iAGv365rHRSAwbw65ZxlWFrUJxNrrYPvYR3ZfUwojbNVDUjsUzJ9glhOU8tOrtF+ozHTd16o3dadM/n8VHbQgFV3GBBC5nocouH8ewFiUqT3jz6Y+vQpNz9IkJ0cfMuDYUOq/GNvMalEsXEHVqVO/i1dRhzbxrf1yHm1GhGykzChDEGNv2laIeACFh1b6zCLrpbLxV35xugM+f4aSw+OAB3rVjAOzcaBF/qrq/nZQNlbtCNhSkK+uXNZuszxAOKMhR1XVMzhHNqmOgTVQ9bZBegF2qrjlLzG9b+Hmtigfv40yBuNoCGGm8ai1U7/vL6nixy0wXMpYrsoLz1LNYCooBdNrN+mVJRfl7YZuA0EpSi8P61NrEMvXXd+33NIHGZGJXjRbSlQPgiGTVv4c7qLYhd1WoBl7nl0ub90557mRdvdXVYIjdCvP+USg2eLR6NKh1MszPHXsfD8XfHcCmUfO858ITkRoR9WsisatbYBqVhDr9BME2bMleEfoW4RLePONALHE2IAvYhvWoEgtjqoIwQUksewWtIS9YZanvt1lGu27nRiay4JYJuN8/725/moy94LD1w9JdzMcKn0N0yMjA/tjGvZznh1JcdE9wXk4c44Q17UThQO+YY0idcZ7vus55z3vS+QFfxb5l39XVGkHd7P2n3Hxlec8lnuXvd61oN3rwApn5DFAFdlUJ75NUIqWGoDobx8ykENQqE+7fkzyATlkqzXFrL3JzFGphXzilr0+HdeVuTHpmbvVDyAjE++9uFxXiqGVIn5oM/EvdEm2ft61snkXAaf7RcDnAdHlftSwU+DbhM7qP8DlJWDnwlm2WJ1FU5scE8sBGsN93tdaSvlyFbQLbEZ+F7MeakU1ssv+Xmvsv7LVvwhk1CytXfI5CkQ+y+tdyvkcbX2PmqNDBDQFT0CQkCDuMVUa3aq5/ExK9m87E0zFOXdTrb0/8tMZgojUGU78tmaaTCa2gZ6gLnTdt8xzCwusyHljnSS3pu9d+JbXILAyIc78R/JuF7unAPOqIlyCo0UfbPK8ld1k9DKGnuIya/ADCUMDydre3jt2MbW67/mVkjox8yWPZQdz1tPkr9kMZ//INj4uCqVm7xptuTVej5DOCp917zhQbFRCp07j69uOv28W03URKA2dPmgvN27GeYsUulI8xG0jReFbGDVYMjZz01uZyKN8qER9Av900r31SuyKGdedyAAmNFbYFjUJHN2+jU3ncPjRxhYLcFZqdKt8ZX9CLrOcTm0gVf+e/+yeoIwIxaTgU5qP0YRkA64k4OuW/0zsjaSoA5jgeCl7++evraP2SJ5+2sG4AeSwfbZr85mZJLEtKfy3Yzzd9Wt0I/Hb7p1GvbY4VhEw/URCTjVf6Y0hbamV4sKXDp7xtQuFDnP3nw9TYw6ZanLxHGbv+I6bvbGrsTrk2JlLOrntIO4Q2CvO48wunxFzbSvOwN+B8xD6HiVdteFm2W3sml09TYdyNj3V0MuvVE1S+tNwWc5mwBcET6WgiH8UFAsTkuO8/Bmtr8d4ghYgMYoHqWM3pH00XGMlIRklSR5Iwz+9G4s1HJJ6TkvXI26B1xKDfknNPra8OdPrQXvAr92CsC9azwh4HYq2ddCt4zSASdIphvbAYYGsc860NnVWYiq1PoXdmCKh4tIEGtTOHqIO+xD7CV8pGy/ywp09+2Qbpb/Il6u9DkZk5hwSQwjnAAsxI8VpzDK1rsQMDFOXyx8r47iEmb70zIhalEnuz3u15R6sUI7fI3rkByFtSME9GppfXfJkGFFZQs1S7g34+Alx9t29qFOy9QyiVb0FgLULh6WCOqmM4DUV8kfUUm0+n62CXZ38m5kEdBNe2T6j5TQt8syWYSagvnr02E+vO+F87IbP88LSEHfp/rcxIidVnAhvw3HyA8o8i/QhC6eLbhtPajHnvdyHG4A/ggYh2QKkM5a+WpmPkMXwWh0yByuuvu0bDmO8cILAyv0odAgVQ8e6aw+OXhXzpp5teFJ0v00ddWf53xE/Ot3cYZz1MYUCieLJ9b+p38Ls8N9HKd2ivXZLVP+TacmQ/v3A6JhE6NuAvDbtQn9I317Iz4sFxUjARIX+2KrhF2MEQn8fK3i+I/Ijpb/fsUul8QagQ050Err8tpmL8qg1Pp6uNQ+R1A6yYe/quM9foEy+P+2fgqGahsgyaQJ3huct7kqvcLM2iPqjG3f0Trj8RcErKeuqdyZvvTHK1VDekmCMXrlxGtt8HigZF+lbK7g/+GfhKMZoOdQ/z2EQhOJM8KQ2ARej06dG42NR6hI4LSSvB53GavXKpBTaEX4KW83DTI5HPq9ouNp7E+A1PJO1Qb3YmqJ8h92dMFt5YRzGeghFb9k3XFODl2+e7OaNrkLY+wEs/RQQszn+jD1Dg7ThgaPQuZi5SgrghJsOvqdjM9/w",
+          "signature": "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",
+          "keyId": "issuer-example-mldsa65-1",
+          "payloadVersion": "GVP-Attestation/3",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"alg\":\"ML-DSA-65\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/3\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "ML-DSA-65 (hedged, so this signature is verify-only and changes on every regeneration). A verifier without ML-DSA-65 reports unverifiable (spec §8)."
+    },
+    {
+      "name": "v2-integrity-only-no-key-list",
+      "keyList": "none",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "No key list: verified against the embedded publicKey, scope integrity (not identity)."
+    },
+    {
+      "name": "unbound-issuer-name-changed",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Someone Else",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "issuer.name and issuer.url are not signed. Only issuer.service is."
+    },
+    {
+      "name": "unbound-anchor-registry-changed",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:1",
+          "chainId": 8453,
+          "registry": "0x0000000000000000000000000000000000000000",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "Only onChainAnchor.agentId is signed. A verifier takes registry and chain from its own context, never from the receipt."
+    },
+    {
+      "name": "unbound-tool-howToVerify-recheckUrl-changed",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "x",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://elsewhere.example/"
+        },
+        "recheckUrl": "https://elsewhere.example/",
+        "howToVerify": [
+          "x"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "Presentation members are not signed."
+    },
+    {
+      "name": "unbound-signature-signed-and-note-changed",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "anything",
+          "note": "anything"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "signature.signed is an informational recipe, not the authority (spec §6.4 is)."
+    },
+    {
+      "name": "hash-bound-result-changed",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 1,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": false,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "result, canonicalInputs and method are bound only through responseHash: the signature still verifies, and responseHashRederives is false. A verifier MUST run both checks."
+    },
+    {
+      "name": "issuer-service-changed",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "evil.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"evil.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}"
+    },
+    {
+      "name": "issuer-as-string",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": "issuer.example",
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": null,
+      "note": "issuer must be an object; the payload member comes from issuer.service only."
+    },
+    {
+      "name": "agentId-changed",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "43"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"43\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}"
+    },
+    {
+      "name": "anchor-stripped",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":null,\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "Stripping the anchor makes agentId null, which is not what was signed."
+    },
+    {
+      "name": "issuedAt-reformatted-same-instant",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "issuedAt is the exact string; a reformatted equal instant is different bytes."
+    },
+    {
+      "name": "fixedPointVersion-stripped",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": null,
+      "note": "No default at L2: the §2.1.1 absent-means-/1 rule is for unsigned use only."
+    },
+    {
+      "name": "fixedPointVersion-forged",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/1",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/1\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}"
+    },
+    {
+      "name": "payloadVersion-stripped-downgrade",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "Rebuilt as /1, which was not signed. A verifier MUST NOT then try /2."
+    },
+    {
+      "name": "responseHash-changed",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": false,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:0000000000000000000000000000000000000000000000000000000000000000\"}"
+    },
+    {
+      "name": "keyId-rewritten",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "not-listed",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}"
+    },
+    {
+      "name": "payloadVersion-unknown",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "ZAyAx11VjDYI6Jvzn5mRj7rKVldgBteY8TDgpiT52TQoXehgQ+c2Riw80c7K41bHxTbcG9iSHKjI0nLkV0JGBQ==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/9",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "unverifiable",
+      "responseHashRederives": true,
+      "expectedPayload": null
+    },
+    {
+      "name": "unsigned-receipt",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": null
+      },
+      "expected": "unverifiable",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"42\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"issuedAt\":\"2026-11-18T04:00:00.000Z\",\"issuer\":\"issuer.example\",\"responseHash\":\"sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6\"}",
+      "note": "L1 only: nothing to attest. A consumer that requires L2 rejects it by its own policy."
+    },
+    {
+      "name": "v3-alg-stripped",
+      "keyList": "published",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Example Issuer",
+          "service": "issuer.example",
+          "url": "https://issuer.example"
+        },
+        "issuedAt": "2026-11-18T04:00:00.000Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "netAnnual": 68627.5,
+          "periodsPerYear": 26
+        },
+        "method": "net = salary - federal - fica",
+        "dataVintage": "2026-07",
+        "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "g",
+          "reproduceUrl": "https://issuer.example/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://issuer.example/v1/verify-hash",
+        "howToVerify": [
+          "recompute",
+          "re-derive",
+          "tamper-check",
+          "identity"
+        ],
+        "disclaimer": "test vector",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "42"
+        },
+        "signature": {
+          "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+          "signature": "1vv4FhHFOkLRbbMs6ZvrHInW+fiOA6zmpDzdNWwhjnAbVhQJ9PMVlcs2gs9nRjgkHF6m5BLe+aQodvDjuxSJAg==",
+          "keyId": "issuer-example-ed25519-1",
+          "payloadVersion": "GVP-Attestation/3",
+          "signed": "see spec §6.4"
+        }
+      },
+      "expected": "contradicted",
+      "responseHashRederives": true,
+      "expectedPayload": null
+    },
+    {
+      "name": "live-x402toll-receipt",
+      "keyList": "live",
+      "receipt": {
+        "receiptVersion": "GVP-Receipt/0.2",
+        "issuer": {
+          "name": "Tollbooth",
+          "service": "x402toll.com",
+          "url": "https://x402toll.com"
+        },
+        "issuedAt": "2026-11-18T01:52:49.847Z",
+        "tool": "paycheck",
+        "endpoint": "/v1/paycheck",
+        "canonicalInputs": {
+          "salary": 85000,
+          "state": "TX"
+        },
+        "result": {
+          "inputs": {
+            "salary": 85000,
+            "state": "TX",
+            "filingStatus": "single",
+            "payFrequency": "biweekly"
+          },
+          "stateName": "Texas",
+          "stateTaxType": "No state income tax",
+          "federalTax": 9870,
+          "stateTax": 0,
+          "socialSecurity": 5270,
+          "medicare": 1232.5,
+          "additionalMedicare": 0,
+          "ficaTotal": 6502.5,
+          "totalTax": 16372.5,
+          "netAnnual": 68627.5,
+          "netPerCheck": 2639.52,
+          "periodsPerYear": 26,
+          "effectiveRatePct": 19.26,
+          "federalMarginalRatePct": 22
+        },
+        "method": "taxable = salary - standardDeduction; federal = marginal 2026 brackets; state = marginal/flat per 51-jurisdiction table (MFJ doubles single thresholds); FICA = 6.2% SS to wage base + 1.45% Medicare + 0.9% additional over threshold; net/check = netAnnual / payPeriods",
+        "dataVintage": "2026-07",
+        "sources": [
+          {
+            "label": "2026 federal brackets & standard deduction",
+            "ref": "IRS Rev. Proc. 2025-32",
+            "asOf": "2026"
+          },
+          {
+            "label": "2026 FICA / Social Security wage base $184,500",
+            "ref": "SSA 2026 + IRS Notice 2025-67",
+            "asOf": "2026"
+          },
+          {
+            "label": "2026 state income-tax schedules (51 jurisdictions)",
+            "ref": "State revenue departments / Tax Foundation 2026",
+            "asOf": "2026"
+          }
+        ],
+        "responseHash": "sha256:2d0a3094dd057b542aabc49180bd277bf242504d9d91468158f8f3df4a780b62",
+        "fixedPointVersion": "GVP-FixedPoint/2",
+        "trustModel": "recompute-trust",
+        "goldenVector": {
+          "reference": "TX $85k single biweekly -> net $2,639.52/check, fed $9,870.00, FICA $6,502.50 (Reckon VERIFICATION.md 2026-07-08)",
+          "reproduceUrl": "https://x402toll.com/v1/golden/paycheck"
+        },
+        "recheckUrl": "https://x402toll.com/v1/verify-hash",
+        "onChainAnchor": {
+          "standard": "ERC-8004",
+          "chain": "eip155:8453",
+          "chainId": 8453,
+          "registry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+          "agentId": "59110"
+        },
+        "howToVerify": [
+          "1. Recompute the fixed point: canonical SHA-256 over {endpoint, inputs, result, method, dataVintage} must equal responseHash (sha256:2d0a3094dd057b542aabc49180bd277bf242504d9d91468158f8f3df4a780b62).",
+          "2. Re-derive for free: GET https://x402toll.com/v1/golden/paycheck returns the canonical (inputs -> result -> hash); confirms the math without trusting the issuer.",
+          "3. Tamper-check a stored copy: POST {response, inputs} to https://x402toll.com/v1/verify-hash.",
+          "4. Issuer identity is on-chain: ERC-8004 agentId 59110 in registry 0x8004A169FB4a3325136EB29fA0ceB6D2e539a432 on eip155:8453.",
+          "5. The signature (if present) attests WHO issued this receipt and WHEN — not that the answer is correct. Correctness is proven by steps 1-3."
+        ],
+        "disclaimer": "Estimates only — not financial, legal, or tax advice. Computed from published 2026 datasets and stated formulas; verify with a qualified professional before acting.",
+        "signature": {
+          "alg": "Ed25519",
+          "publicKey": "MCowBQYDK2VwAyEAii2LYVNURyAu/bi2LUSmjQBdrRPL6xt/+nI7gSnU950=",
+          "keyId": "x402toll-ed25519-5e57c914572251f2",
+          "signature": "ouX7i7a2CkouPmsbmhlQ03cmF1qoA7OXmFd+KqbGRh30druo2E7HjXqxJCFRankukopTkNj45aniXC38Sp/UAQ==",
+          "payloadVersion": "GVP-Attestation/2",
+          "signed": "canonicalJson({responseHash, endpoint, dataVintage, issuer, agentId, issuedAt, payloadVersion, fixedPointVersion}) — GVP-Attestation/2",
+          "note": "Attests issuance (who + when) and binds fixedPointVersion, not correctness. Correctness is proven by recompute-trust (responseHash + golden vector)."
+        }
+      },
+      "expected": "verified",
+      "responseHashRederives": true,
+      "expectedPayload": "{\"agentId\":\"59110\",\"dataVintage\":\"2026-07\",\"endpoint\":\"/v1/paycheck\",\"fixedPointVersion\":\"GVP-FixedPoint/2\",\"issuedAt\":\"2026-11-18T01:52:49.847Z\",\"issuer\":\"x402toll.com\",\"payloadVersion\":\"GVP-Attestation/2\",\"responseHash\":\"sha256:2d0a3094dd057b542aabc49180bd277bf242504d9d91468158f8f3df4a780b62\"}",
+      "note": "A paid mainnet receipt from x402toll.com (2026-11-18, the one reproduced on x402-foundation/x402#2887), against its /.well-known/gvp-keys.json."
+    }
+  ],
+  "revocationLists": {
+    "empty": {
+      "revocationListVersion": "GVP-Revocation/0.2",
+      "issuer": "issuer.example",
+      "updatedAt": "2026-11-18T04:00:00.000Z",
+      "revoked": [],
+      "signature": {
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "xiEtYgTgKoCE7R2kCccYpWVJttllPqzdCQl/W4EcmAGmEk5Zo8belZIGH4Xi1vXzK2CniGovuOx/hKXH7+F4Bg==",
+        "keyId": "issuer-example-ed25519-1"
+      }
+    },
+    "one": {
+      "revocationListVersion": "GVP-Revocation/0.2",
+      "issuer": "issuer.example",
+      "updatedAt": "2026-11-18T04:00:00.000Z",
+      "revoked": [
+        {
+          "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+          "reason": "test: wrong dataset row",
+          "revokedAt": "2026-11-18T04:00:00.000Z",
+          "supersededBy": null
+        },
+        {
+          "kind": "reportHash",
+          "reportHash": "sha256:abababababababababababababababababababababababababababababababab",
+          "reason": "test: report revoked",
+          "revokedAt": "2026-11-18T04:00:00.000Z"
+        }
+      ],
+      "signature": {
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "PKQtwzJOPnYUF5XVouXh+5td7Kmvw4AfTqzQqzwbugRQ0zDNz2ZpvwdYB4Qr3HERdybmnfjnw+Nc1aEzg2emAQ==",
+        "keyId": "issuer-example-ed25519-1"
+      }
+    },
+    "tampered": {
+      "revocationListVersion": "GVP-Revocation/0.2",
+      "issuer": "issuer.example",
+      "updatedAt": "2026-11-18T04:00:00.000Z",
+      "revoked": [],
+      "signature": {
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "PKQtwzJOPnYUF5XVouXh+5td7Kmvw4AfTqzQqzwbugRQ0zDNz2ZpvwdYB4Qr3HERdybmnfjnw+Nc1aEzg2emAQ==",
+        "keyId": "issuer-example-ed25519-1"
+      }
+    },
+    "badKind": {
+      "revocationListVersion": "GVP-Revocation/0.2",
+      "issuer": "issuer.example",
+      "updatedAt": "2026-11-18T04:00:00.000Z",
+      "revoked": [
+        {
+          "kind": null,
+          "responseHash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+          "reason": "test: kind null",
+          "revokedAt": "2026-11-18T04:00:00.000Z"
+        }
+      ],
+      "signature": {
+        "alg": "Ed25519",
+        "publicKey": "MCowBQYDK2VwAyEA/UETLdE5LPkh/DuX5cgbBjXncvaOi5x8sNDnA8r9fbM=",
+        "signature": "iFgX2anZ5VHpPxcrdSuyzNlnOBmocf8qSUSy9iGoTKmKaxzOb2wD8LdogMlxm7ZM/pYv5I4jBrts3sk9yw9ECw==",
+        "keyId": "issuer-example-ed25519-1"
+      }
+    },
+    "unsigned": {
+      "revocationListVersion": "GVP-Revocation/0.2",
+      "issuer": "issuer.example",
+      "updatedAt": "2026-11-18T04:00:00.000Z",
+      "revoked": [],
+      "signature": null
+    }
+  },
+  "revocationCases": [
+    {
+      "name": "empty-signed-list-not-revoked",
+      "list": "empty",
+      "hash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+      "expected": "not-revoked"
+    },
+    {
+      "name": "listed-responseHash-revoked",
+      "list": "one",
+      "hash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+      "expected": "revoked"
+    },
+    {
+      "name": "listed-reportHash-revoked",
+      "list": "one",
+      "hash": "sha256:abababababababababababababababababababababababababababababababab",
+      "kind": "reportHash",
+      "expected": "revoked"
+    },
+    {
+      "name": "reportHash-does-not-match-responseHash-kind",
+      "list": "one",
+      "hash": "sha256:abababababababababababababababababababababababababababababababab",
+      "expected": "not-revoked"
+    },
+    {
+      "name": "tampered-list-unverifiable",
+      "list": "tampered",
+      "hash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+      "expected": "unverifiable",
+      "note": "Removing an entry breaks the signature; the status is unverifiable, never not-revoked."
+    },
+    {
+      "name": "unreachable-list-unverifiable",
+      "list": "unreachable",
+      "hash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+      "expected": "unverifiable"
+    },
+    {
+      "name": "entry-kind-null-unverifiable",
+      "list": "badKind",
+      "hash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+      "expected": "unverifiable",
+      "note": "kind must be absent, \"responseHash\" or \"reportHash\"; any other value (null included) makes the list malformed."
+    },
+    {
+      "name": "unsigned-list-unverifiable",
+      "list": "unsigned",
+      "hash": "sha256:a4c5322d56baa72041c280c2e73d624495a94c5d9f2d4316210d42e6ef004ed6",
+      "expected": "unverifiable"
+    }
+  ]
+}

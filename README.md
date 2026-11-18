@@ -215,6 +215,8 @@ escaping non-ASCII). This repo proves all of it empirically before relying on th
 npm install
 npm test                                       # L1 hashes + L2 signatures + the JCS gate
 node tools/check-attestation-v3.mjs            # /3: Ed25519 + ML-DSA-65 vectors, key-first outcomes, key-list refetch bound, kept key lists
+node tools/check-receipt-payload.mjs           # full receipts: §6.4 payload rebuild, outcomes, revocation statuses
+node tools/spec-only-verify.mjs                # the same vectors, verified from the spec text alone (no ref/ code)
 
 node tools/check-js.mjs                        # JS: reproduce L1 hashes + verify L2 signatures
 node tools/check-jcs.mjs                       # JS canonicalization vs an INDEPENDENT RFC 8785 impl
@@ -357,6 +359,7 @@ tools/gen-attestation.mjs     generate L2 attestation vectors (/1, /2) with the 
 tools/gen-attestation-v3.mjs  generate the /3 vectors (Ed25519 + ML-DSA-65) and the key-first outcome table
 tools/gen-attestation-kept.mjs  generate the kept-key-list outcome table (Ed25519, deterministic)
 tools/check-attestation-v3.mjs  /3 check: vectors, outcomes (verified / unverifiable / contradicted), refetch bound, kept lists
+tools/spec-only-verify.mjs      receipt verifier written from the spec alone; CLI: --receipt r.json --keys gvp-keys.json
 tools/tenprint-mldsa65/       ML-DSA-65 cross-check: re-sign /3 with @noble/post-quantum 0.3.0, verify both ways (tools-only deps)
 docs/RECOMPUTE-NOT-TRUST.md   category note: the five trust models and where GVP sits
 docs/REGULATORY-BRIDGE.md     GVP artifacts mapped to EU AI Act / ISO 42001 / NIST AI RMF evidence classes

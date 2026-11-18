@@ -63,7 +63,7 @@ make such skew visible and nameable rather than silent:
   **Backward-compatibility carve-out for the Verification Receipt (§5):** receipts issued before this
   section existed carry no `fixedPointVersion`; the receipt schema therefore keeps it OPTIONAL so those
   receipts remain valid. A verifier MUST treat a receipt with no `fixedPointVersion` as
-  `"GVP-FixedPoint/1"` (the only rule set that has ever existed). New receipts SHOULD carry it.
+  `"GVP-FixedPoint/1"` (the only rule set that existed before this field did). New receipts SHOULD carry it.
 - The identifier lives **beside** the hash, never inside the hashed L1 fixed point. Placing it inside
   would change every existing hash and break the §2.1 guarantee that the same fixed point always
   produces the same hash.
@@ -75,7 +75,11 @@ make such skew visible and nameable rather than silent:
   re-derivability **and** binds the rule-set claim. An issuer that needs the claim bound MUST emit L2.
 - A verifier MUST read `fixedPointVersion` before recomputing. An unknown or unsupported identifier MUST
   be reported as **"unsupported fixed-point rule set"**, never as a hash mismatch or forgery. At L2 the
-  verifier MUST take the identifier from the *signed payload*, never from an unsigned sibling field.
+  identifier a verifier recomputes under is the one the signature covers: it rebuilds the signed payload
+  from the receipt's `fixedPointVersion` member (§6.4), so a stripped or forged value fails the
+  signature instead of being believed. The absent-means-`/1` rule above applies only where nothing
+  signs the identifier (a bare L1 response, or a `/1` receipt); under `/2` and `/3` a missing
+  `fixedPointVersion` is `contradicted`, never defaulted.
 - **`GVP-FixedPoint/1` is frozen.** It will never gain or lose a member. A need for a different member
   set MUST be published as a new identifier (`GVP-FixedPoint/2`, …) with its own conformance vectors; it
   MUST NOT be introduced by editing this definition.
@@ -308,6 +312,25 @@ A **receipt** is a portable record wrapping a fixed point plus its recompute-tru
 - If `signature` is present it MUST verify under §6; a present-but-invalid signature makes the receipt
   non-conformant (a consumer MUST reject it).
 
+**What each check covers.** Every receipt member is in exactly one of these classes, and
+`vectors/receipt.json` pins each class with cases:
+
+| Class | Members | A change is caught by |
+|---|---|---|
+| Signed (§6.4) | `responseHash`, `endpoint`, `dataVintage`, `issuedAt`, `issuer.service`, `onChainAnchor.agentId`, `signature.payloadVersion`, `fixedPointVersion` (`/2`, `/3`), `signature.alg` (`/3`) | the signature |
+| Hash-bound (§3) | `canonicalInputs`, `result`, `method` | the `responseHash` recomputation, not the signature |
+| Signature members | `signature.signature` (the signature itself), `signature.keyId`, `signature.publicKey` | the signature check: they are not signed, but they are the signature or select its key (§6.3) |
+| Unbound | every other member: `receiptVersion`, `issuer.name`, `issuer.url`, `tool`, `sources`, `trustModel`, `goldenVector`, `recheckUrl`, `howToVerify`, `disclaimer`, `signatureNote`, `onChainAnchor` members other than `agentId`, and `signature.signed`, `signature.note` and any other `signature` member | nothing: informational |
+
+A verifier MUST run both the signature check (§6) and the §3 recomputation; either alone leaves a class
+unchecked. Two unbound members are easy to over-read:
+
+- `recheckUrl` is an informational pointer to the issuer's re-check helper, typically an HTTP POST whose
+  request shape is the issuer's. It is neither a key list nor a revocation list.
+- `onChainAnchor.registry`, `chain` and `chainId` are not signed. A verifier that checks the anchor
+  MUST take the registry and chain from its own context (the registry it trusts) and compare only the
+  signed `agentId`.
+
 ## 6. Issuer attestation (L2)
 
 The issuer signs the **attestation payload**, the canonical JSON (§2.2) of a **named payload shape**.
@@ -323,14 +346,18 @@ GVP-Attestation/1  (legacy — receipts issued before fixedPointVersion existed;
 GVP-Attestation/2  (Ed25519 only; no alg member)
 { "responseHash": <string>, "endpoint": <string>, "dataVintage": <string>,
   "issuer": <string>, "agentId": <string|null>, "issuedAt": <RFC3339 string>,
-  "payloadVersion": "GVP-Attestation/2", "fixedPointVersion": "GVP-FixedPoint/1" }
+  "payloadVersion": "GVP-Attestation/2", "fixedPointVersion": <rule-set identifier, §2.1.1> }
 
 GVP-Attestation/3  (current — /2 plus the signing algorithm, signed)
 { "responseHash": <string>, "endpoint": <string>, "dataVintage": <string>,
   "issuer": <string>, "agentId": <string|null>, "issuedAt": <RFC3339 string>,
-  "payloadVersion": "GVP-Attestation/3", "fixedPointVersion": "GVP-FixedPoint/1",
+  "payloadVersion": "GVP-Attestation/3", "fixedPointVersion": <rule-set identifier, §2.1.1>,
   "alg": "Ed25519" | "ML-DSA-65" }
 ```
+
+`fixedPointVersion` is whichever rule set defined the receipt's fixed point (`"GVP-FixedPoint/1"` or
+`"GVP-FixedPoint/2"`), copied from the receipt (§6.4); it is not a constant of the shape. Where each
+member comes from in a receipt is §6.4.
 
 - **Shape selection is explicit, never guessed.** A payload with no `payloadVersion` member is shape
   `/1`. A verifier MUST reconstruct the shape the receipt declares and MUST NOT try alternatives on
@@ -342,7 +369,7 @@ GVP-Attestation/3  (current — /2 plus the signing algorithm, signed)
   `responseHash`) and its unsigned L1 sibling (§2.1.1) is informational only.
 - `/1`, `/2` and `/3` sign different byte strings for the same logical receipt; that is intended and
   the conformance vectors cover all three (`vectors/attestation.json`, `vectors/attestation-v2.json`,
-  `vectors/attestation-v3.json`).
+  `vectors/attestation-v3.json`), and `vectors/receipt.json` covers them as full receipts.
 
 ### 6.1 Algorithms
 
@@ -383,6 +410,9 @@ Two algorithms are defined:
     "keys": [ { "keyId": <string>, "alg": "Ed25519" | "ML-DSA-65", "publicKey": <base64 SPKI DER> } ] }
   ```
 
+  The list's `issuer` MUST equal the `issuer` member the issuer signs (for a receipt,
+  `issuer.service`, §6.4). It is a label: the list's location (below), not this string, establishes
+  whose keys they are, so a verifier MAY report a mismatch but it does not change the outcome.
   Each entry pins exactly one `alg`, and the key's SPKI algorithm MUST match it. Every attestation MUST
   be verifiable for the life of the receipt: the issuer MUST keep every historical key listed, so a
   receipt signed by a rotated-out key still verifies. The list is append-only: a `keyId`, once listed,
@@ -482,6 +512,41 @@ verifier must pick a primitive before it can check the signature, by @whawk46 th
 refetch and the fixed ML-DSA-65 mode and context by @whawk46 on 2026-10-16; the case of an origin that
 stops resolving, which kept key lists answer, by @giskard09 (x402-foundation/x402#3304, 2026-10-21).*
 
+### 6.4 Rebuilding the payload from a receipt (normative)
+
+A verifier rebuilds the payload of §6 from the receipt with this table and nothing else. Each member has
+exactly one source; there are no alternatives to try and no defaults beyond the ones written here.
+
+| Payload member | Source in the receipt | Rule |
+|---|---|---|
+| `responseHash` | `responseHash` | string |
+| `endpoint` | `endpoint` | string, exactly as in the receipt (the path the fixed point hashed) |
+| `dataVintage` | `dataVintage` | string |
+| `issuer` | `issuer.service` | `issuer` MUST be an object with a string `service`; `issuer.name` and `issuer.url` are not signed |
+| `agentId` | `onChainAnchor.agentId` | JSON `null` when `onChainAnchor` is `null` or absent; otherwise `onChainAnchor` MUST be an object with a string `agentId` |
+| `issuedAt` | `issuedAt` | the exact string, never parsed and re-serialized (`2026-11-18T04:00:00.000Z` and `2026-11-18T04:00:00Z` are different bytes) |
+| `payloadVersion` | `signature.payloadVersion` | absent, null or `"GVP-Attestation/1"` = shape `/1`, and the member is omitted; `/2` and `/3` are copied; any other value is `unverifiable` |
+| `fixedPointVersion` | `fixedPointVersion` | `/2` and `/3` only; no default (absent = `contradicted`) |
+| `alg` | `signature.alg` | `/3` only; absent = `contradicted`. The verifier still takes the algorithm from the listed key (§6.3); a forged value fails the signature |
+
+- A member of the wrong type, or a required member that is absent, is `contradicted`: a conformant
+  issuer cannot have signed it. A shape the verifier does not implement is `unverifiable` (§6.3).
+- The payload string is the canonical JSON (§2.2) of exactly these members; the signature is then checked
+  under §6.1 and §6.3.
+- `signature.signed` is an informational recipe an issuer MAY include. It is not signed and not the
+  authority: this table is.
+- A receipt whose `signature` is `null` or absent carries no attestation (L1 only). A verifier reports
+  that it could not check one (`unverifiable`); a consumer that requires L2 rejects the receipt under
+  its own policy.
+- The JS and Python references implement this table as `receiptPayload(receipt)` /
+  `receipt_payload(receipt)` and `verifyReceipt` / `verify_receipt`; `tools/spec-only-verify.mjs`
+  implements it again from this text with no reference code. All three reach every case in
+  `vectors/receipt.json`, which includes a paid mainnet receipt checked against its issuer's
+  published key list.
+
+*Rationale: raised by @giskard09 (x402-foundation/x402#2887, 2026-11-18), who verified a paid receipt end
+to end and found that the mapping from receipt to payload had to be assumed.*
+
 ## 7. Revocation (errata path)
 
 Reproducibility means a wrong answer, once issued, stays reproducibly wrong — so GVP needs an errata
@@ -495,15 +560,34 @@ values. Schema: `schema/revocation-list.schema.json`.
   "updatedAt": <RFC3339 string>,
   "revoked": [ { "responseHash": <string>, "reason": <string>, "revokedAt": <RFC3339>,
                  "supersededBy": <string|null> } ],
-  "signature": { "alg": "Ed25519", "publicKey": <b64>, "signature": <b64> } }
+  "signature": { "alg": "Ed25519", "keyId": <string>, "publicKey": <b64>, "signature": <b64> } }
 ```
 
-- The list is signed over the canonical JSON (§2.2) of the document with the `signature` member
-  removed, using the §6 scheme.
-- It is **append-only**: a `responseHash` once listed MUST remain listed (monotonic); consumers MAY
-  cache it and MUST treat a hash's disappearance as tampering.
+- **Location.** A verifier locates the list the way it locates the key list (§6.2), from context it
+  already holds and never from a receipt field: for a paid HTTP response,
+  `/.well-known/gvp-revocations.json` on the origin the verifier paid. An issuer that signs receipts
+  SHOULD serve it there; an issuer with nothing revoked serves a signed list with an empty `revoked`
+  array, which is valid and means nothing is revoked.
+- **Signature.** The list is signed over the canonical JSON (§2.2) of the document with the `signature`
+  member removed, by a key in the same origin's key list (§6.2), and checked key-first (§6.3): the key and
+  its `alg` come from the list entry named by `keyId` (or, without `keyId`, matched by `publicKey`).
+  The `revocationListVersion` member separates these bytes from every attestation payload signed by
+  the same key.
+- **Entries.** An entry with no `kind`, or `"kind": "responseHash"`, revokes the receipt answer with
+  that `responseHash`. An entry with `"kind": "reportHash"` and a `reportHash` member revokes a signed
+  report its issuer identifies by `reportHash`. A verifier matches only entries of the kind it checks.
+  An entry with any other `kind` value, `null` included, or without its hash, makes the list malformed.
+- It is **append-only**: an entry once listed MUST remain listed (monotonic), and `updatedAt` MUST NOT
+  move backwards; consumers MAY cache the list and MUST treat an entry's disappearance as tampering.
+  These two rules span fetches, so they are checked by a consumer that keeps earlier lists; the
+  references check one fetched list at a time.
+- **Outcomes.** Checking a hash ends in exactly one of `not-revoked` (the list verifies and has no
+  matching entry), `revoked` (the list verifies and has one; cite `reason` and `supersededBy` when
+  present) or `unverifiable` (the list cannot be fetched, is unsigned, is malformed, or does not verify).
+  A list that does not verify never reads as `not-revoked`.
 - A conformant verifier SHOULD check a receipt's `responseHash` against the issuer's current revocation
-  list and surface a revoked answer as **revoked**, citing `supersededBy` when present.
+  list and report the status beside the §6.3 outcome; they are separate statements. Cases:
+  `vectors/receipt.json` (`revocationCases`).
 
 ## 8. Conformance test suite
 
@@ -512,7 +596,9 @@ canonical-hash fixtures. An implementation is **L1-conformant** iff it reproduce
 L2 conformance additionally requires reproducing the attestation vectors in `vectors/attestation.json`,
 `vectors/attestation-v2.json` and `vectors/attestation-v3.json` (sign-and-verify round trips and a
 cross-implementation verify), and reaching the expected outcome (§6.3) for every case in
-`vectors/attestation-outcomes.json`. A verifier that keeps key lists MUST also reach the expected
+`vectors/attestation-outcomes.json`, and, for every full receipt in `vectors/receipt.json`,
+rebuild the payload by §6.4 byte for byte, reach the expected outcome and match `responseHashRederives`;
+a verifier that checks revocation also reaches every `revocationCases` status (§7). A verifier that keeps key lists MUST also reach the expected
 outcome, `keptAt` and discontinuity for every case in `vectors/attestation-kept.json`. A verifier that does not implement ML-DSA-65 MUST report
 `unverifiable` for the ML-DSA-65 cases, and is conformant in doing so. The suite MUST pass in at least two
 independent implementations; the repo ships JS (`ref/js`) and Python (`ref/py`) references that do.
@@ -571,5 +657,7 @@ remedy is a precondition on issuing a finding rather than another branch inside 
   first fetch returned, so the key-list fetch SHOULD be made over HTTPS to the paid origin.
 - Key compromise is outside the key list: receipts under a leaked key remain issuance by the holder of
   that key, and revocation (§7) is the remedy, per answer.
+- Only the members in the §5 "Signed" class are covered by a signature. Treat every other member as the
+  issuer's presentation, and take an on-chain registry from your own context, never from the receipt.
 - Revocation is the only sanctioned way to walk back an issued answer; keep it signed and append-only
   (§7) so it cannot itself be used to silently rewrite history.

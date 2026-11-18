@@ -2,6 +2,8 @@
 //
 // L1 (Reproducible): canonicalize + gvpHash — the canonical SHA-256 fixed point over
 //   {endpoint, inputs, result, method, dataVintage} that anyone can re-derive for free.
+// Receipts: receiptPayload / verifyReceipt rebuild and check a whole receipt by the spec §6.4 table;
+//   revocationStatus checks a hash against a signed §7 revocation list.
 // L2 (Signed): attest / verifyAttestation — an optional issuer attestation (Ed25519 or ML-DSA-65,
 //   key-first dispatch, spec §6). It attests ISSUANCE, never correctness; correctness is established
 //   only by reproduction. verifyAttest is the legacy boolean check for /1 and /2.
@@ -16,6 +18,12 @@ export {
   attest,
   verifyAttest,
   verifyAttestation,
+  receiptPayload,
+  receiptPayloadMembers,
+  verifyReceipt,
+  revocationListPayload,
+  verifyRevocationList,
+  revocationStatus,
   createKeyListResolver,
   keepKeyList,
   algOfKey,

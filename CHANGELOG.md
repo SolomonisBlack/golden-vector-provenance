@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.13.0, 2026-11-18
+**Every receipt rebuildable from the receipt plus the spec; no hash change, no signed-bytes change.**
+Answers @giskard09 on x402-foundation/x402#2887, who verified a paid receipt end to end and had to
+assume how the receipt maps onto the signed payload.
+
+- **Spec §6.4 (new, normative):** one source per payload member: `issuer` = `issuer.service`,
+  `agentId` = `onChainAnchor.agentId` (JSON null when the anchor is null or absent), `issuedAt` as the
+  exact string, `payloadVersion` from `signature.payloadVersion` (absent = /1), `fixedPointVersion` from
+  the receipt with no default under /2 and /3, `alg` from `signature.alg` under /3. Wrong type or a
+  missing required member = `contradicted`. `signature.signed` is informational; the table is the authority.
+- **Spec §6:** the /2 and /3 shapes no longer print `"GVP-FixedPoint/1"` as a literal; the member is
+  whichever rule set the receipt declares. §2.1.1 reworded to match: no default at L2.
+- **Spec §5:** a coverage table (signed / hash-bound / unbound). `recheckUrl` is an informational POST
+  helper; `onChainAnchor.registry` and `chain` are not signed and come from the verifier's own context.
+- **Spec §6.2:** the key list's `issuer` equals the signed `issuer` (a label; location decides).
+- **Spec §7:** the revocation list lives at `/.well-known/gvp-revocations.json` on the origin the
+  verifier paid, is signed by a key in that origin's key list and checked key-first, may be empty, and
+  may carry `{"kind": "reportHash"}` entries (any other `kind`, null included, makes the list malformed).
+  Outcomes: `not-revoked` / `revoked` / `unverifiable`; a list that is unsigned or does not verify
+  never reads as `not-revoked`. Schema note: a 0.12.0 schema validator rejects a list that carries a
+  `reportHash` entry; validate with the 0.13.0 schema.
+- **References:** `receiptPayload`, `receiptPayloadMembers`, `verifyReceipt`, `revocationListPayload`,
+  `verifyRevocationList`, `revocationStatus` (JS, exported from the package root) and `receipt_payload`,
+  `verify_receipt`, `revocation_status` (Python).
+- **Vectors:** `vectors/receipt.json` (exported as `golden-vector-provenance/vectors/receipt`): 27 full
+  receipts (/1, /2 with FixedPoint/1 and /2, null and absent anchor, /3 Ed25519 and ML-DSA-65,
+  integrity-only, unbound members that still verify, a hash-bound change, 13 negatives) including the
+  live x402toll.com receipt from #2887 against its published key list, plus 8 revocation cases.
+- **Tools:** `tools/spec-only-verify.mjs` verifies receipts from the spec text alone (node:crypto plus
+  the independent `canonicalize` package, nothing from `ref/`); also a CLI:
+  `node tools/spec-only-verify.mjs --receipt r.json --keys gvp-keys.json [--revocations list.json]`
+  (outside this repo, `npm i canonicalize` first).
+  Both it and `tools/check-receipt-payload.mjs` run in `npm test`.
+- **Schemas:** receipt field descriptions say which members are sources of signed members;
+  revocation-list schema accepts `reportHash` entries and documents the location.
+- `vectors/canonicalization.json`: `empty-containers-and-key-order` is marked a canonicalizer-only
+  probe (its `zzz`/`aaa` members are not a valid fixed point). Hash unchanged.
+
+
 ## 0.12.0 — 2026-10-21; npm release 2026-11-18 (includes 0.11.0, which had no npm release of its own)
 **Kept key lists (last-known-good); no hash change, no payload change.** Answers @giskard09's question
 on x402-foundation/x402#3304: what happens to signed receipts when the issuer's origin stops resolving.

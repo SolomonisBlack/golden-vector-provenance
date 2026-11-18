@@ -178,6 +178,117 @@ export function verifyAttestation(payload, sig, { keyList, kept, implemented = I
     : out('contradicted', 'signature does not verify');
 }
 
+// ---- receipts (spec §6.4): rebuild the signed payload from a receipt, no guessing --------------------
+// Each payload member has exactly one source in the receipt. A member of the wrong type, or a required
+// one that is missing, cannot have been signed by a conformant issuer, so it is `contradicted`.
+const str = (v) => typeof v === 'string';
+export function receiptPayloadMembers(receipt) {
+  if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt)) throw payloadError('receipt is not an object', 'contradicted');
+  for (const m of ['responseHash', 'endpoint', 'dataVintage', 'issuedAt']) {
+    if (!str(receipt[m])) throw payloadError(`receipt.${m} missing or not a string`, 'contradicted');
+  }
+  const iss = receipt.issuer;
+  if (!iss || typeof iss !== 'object' || Array.isArray(iss) || !str(iss.service)) {
+    throw payloadError('receipt.issuer must be an object with a string service', 'contradicted');
+  }
+  const anchor = receipt.onChainAnchor;
+  let agentId = null;                                    // no anchor (absent or null) -> JSON null
+  if (anchor != null) {
+    if (typeof anchor !== 'object' || Array.isArray(anchor) || !str(anchor.agentId)) {
+      throw payloadError('receipt.onChainAnchor must be null or an object with a string agentId', 'contradicted');
+    }
+    agentId = anchor.agentId;
+  }
+  const sig = receipt.signature && typeof receipt.signature === 'object' ? receipt.signature : {};
+  const members = {
+    responseHash: receipt.responseHash, endpoint: receipt.endpoint, dataVintage: receipt.dataVintage,
+    issuer: iss.service, agentId, issuedAt: receipt.issuedAt      // issuedAt: the exact string, never reparsed
+  };
+  const pv = sig.payloadVersion;
+  if (pv == null || pv === ATTESTATION_V1) return members;     // /1: no payloadVersion member
+  if (!str(pv) || (pv !== ATTESTATION_V2 && pv !== ATTESTATION_V3)) {
+    throw payloadError(`unsupported attestation payload version: ${pv}`, 'unverifiable');
+  }
+  // fixedPointVersion has NO default under /2 and /3: a stripped value fails here, not by a guess
+  if (!str(receipt.fixedPointVersion) || !receipt.fixedPointVersion) throw payloadError(`${pv} requires receipt.fixedPointVersion`, 'contradicted');
+  members.payloadVersion = pv;
+  members.fixedPointVersion = receipt.fixedPointVersion;
+  if (pv === ATTESTATION_V3) {
+    if (!str(sig.alg) || !sig.alg) throw payloadError(`${ATTESTATION_V3} requires signature.alg`, 'contradicted');
+    members.alg = sig.alg;
+  }
+  return members;
+}
+
+// The exact string a receipt's issuer signed: attestationPayload(receiptPayloadMembers(receipt)).
+export function receiptPayload(receipt) {
+  return attestationPayload(receiptPayloadMembers(receipt));
+}
+
+// Verify a whole receipt (spec §6.3 + §6.4). Same options and outcomes as verifyAttestation. A receipt
+// with no signature carries no attestation (L1 only), which is `unverifiable` as a statement about
+// what can be checked; a consumer that requires L2 treats it as failing its own policy.
+export function verifyReceipt(receipt, opts = {}) {
+  if (receipt && typeof receipt === 'object' && receipt.signature == null) {
+    return result('unverifiable', 'receipt is unsigned: L1 only, no attestation to check');
+  }
+  let members;
+  try { members = receiptPayloadMembers(receipt); }
+  catch (e) { return result(e.outcome ?? 'contradicted', e.message); }
+  return verifyAttestation(members, receipt.signature, opts);
+}
+
+// ---- revocation lists (spec §7) --------------------------------------------------------------------
+export const REVOCATION_V02 = 'GVP-Revocation/0.2';
+
+// The signed bytes of a revocation list: canonical JSON of the document without its `signature` member.
+export function revocationListPayload(list) {
+  const { signature, ...rest } = list;
+  return canonicalize(rest);
+}
+
+// An entry is { responseHash } (kind absent or "responseHash") or { kind: "reportHash", reportHash }.
+// Any other kind, null included, makes the list malformed (spec §7).
+function validRevocationEntry(e) {
+  if (!e || typeof e !== 'object' || Array.isArray(e)) return false;
+  if (!('kind' in e) || e.kind === 'responseHash') return typeof e.responseHash === 'string';
+  return e.kind === 'reportHash' && typeof e.reportHash === 'string';
+}
+
+// Key-first check of a revocation list, same dispatch as an attestation (spec §6.3) with alg pinned by
+// the listed key. -> { outcome: verified | unverifiable | contradicted, reason }
+export function verifyRevocationList(list, { keyList, implemented = IMPLEMENTED_ALGS } = {}) {
+  if (list === null || list === undefined) return result('unverifiable', 'revocation list unreachable');
+  if (typeof list !== 'object' || Array.isArray(list) || list.revocationListVersion !== REVOCATION_V02 || !Array.isArray(list.revoked)) {
+    return result('contradicted', 'not a GVP-Revocation/0.2 document');
+  }
+  if (!list.revoked.every(validRevocationEntry)) return result('contradicted', 'an entry has an unknown kind or no hash (spec §7)');
+  const sig = list.signature;
+  if (!sig || typeof sig !== 'object') return result('unverifiable', 'revocation list is unsigned');
+  if (!keyList) return result('unverifiable', 'key list unreachable');
+  const entry = (keyList.keys ?? []).find(k => sig.keyId ? k.keyId === sig.keyId : k.publicKey === sig.publicKey);
+  if (!entry) return result('contradicted', 'revocation list key not in the key list');
+  if (!implemented.includes(entry.alg)) return result('unverifiable', `key alg not implemented: ${entry.alg}`);
+  if (sig.publicKey && sig.publicKey !== entry.publicKey) return result('contradicted', 'embedded publicKey differs from the listed key');
+  let key; try { key = spkiKey(entry.publicKey); } catch { return result('contradicted', 'listed publicKey is not SPKI DER'); }
+  if (algOfKey(key) !== entry.alg) return result('contradicted', `listed key type does not match its pinned alg ${entry.alg}`);
+  return rawVerify(revocationListPayload(list), key, sig.signature)
+    ? result('verified', `revocation list signed by ${entry.keyId}`)
+    : result('contradicted', 'revocation list signature does not verify');
+}
+
+// Revocation status of one hash (spec §7): not-revoked | revoked | unverifiable. A list that does not
+// verify, or cannot be fetched, leaves the status unverifiable; it never reads as not-revoked.
+//   kind: 'responseHash' (receipts, the default) or 'reportHash' (signed reports).
+export function revocationStatus(hash, list, { keyList, kind = 'responseHash', implemented } = {}) {
+  const v = verifyRevocationList(list, { keyList, implemented });
+  if (v.outcome !== 'verified') return { status: 'unverifiable', reason: v.reason };
+  const hit = list.revoked.find(e => ('kind' in e ? e.kind : 'responseHash') === kind && e[kind] === hash);
+  return hit
+    ? { status: 'revoked', reason: hit.reason, revokedAt: hit.revokedAt, supersededBy: hit.supersededBy ?? null }
+    : { status: 'not-revoked', reason: `${kind} not listed (list updatedAt ${list.updatedAt})` };
+}
+
 // A keyId, once listed, stays bound to one alg and one key (spec §6.2).
 const sameBinding = (a, b) => a.keyId === b.keyId && a.alg === b.alg && a.publicKey === b.publicKey;
 

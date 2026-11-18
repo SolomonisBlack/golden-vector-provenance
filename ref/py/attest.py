@@ -262,6 +262,125 @@ def verify_attestation(p, sig, key_list=_UNSET, implemented=None, kept=None):
     return out("contradicted", "signature does not verify")
 
 
+# ---- receipts (spec §6.4): rebuild the signed payload from a receipt, no guessing --------------------
+def _is_str(v):
+    return isinstance(v, str)
+
+
+def receipt_payload_members(receipt):
+    """Each payload member has exactly one source in the receipt (spec §6.4). A member of the wrong type,
+    or a required one that is missing, cannot have been signed by a conformant issuer: contradicted."""
+    if not isinstance(receipt, dict):
+        raise PayloadError("receipt is not an object", "contradicted")
+    for m in ("responseHash", "endpoint", "dataVintage", "issuedAt"):
+        if not _is_str(receipt.get(m)):
+            raise PayloadError("receipt.%s missing or not a string" % m, "contradicted")
+    iss = receipt.get("issuer")
+    if not isinstance(iss, dict) or not _is_str(iss.get("service")):
+        raise PayloadError("receipt.issuer must be an object with a string service", "contradicted")
+    anchor = receipt.get("onChainAnchor")
+    agent_id = None
+    if anchor is not None:
+        if not isinstance(anchor, dict) or not _is_str(anchor.get("agentId")):
+            raise PayloadError("receipt.onChainAnchor must be null or an object with a string agentId", "contradicted")
+        agent_id = anchor["agentId"]
+    sig = receipt.get("signature") if isinstance(receipt.get("signature"), dict) else {}
+    members = {"responseHash": receipt["responseHash"], "endpoint": receipt["endpoint"],
+               "dataVintage": receipt["dataVintage"], "issuer": iss["service"], "agentId": agent_id,
+               "issuedAt": receipt["issuedAt"]}
+    pv = sig.get("payloadVersion")
+    if pv is None or pv == ATTESTATION_V1:
+        return members
+    if pv not in (ATTESTATION_V2, ATTESTATION_V3):
+        raise PayloadError("unsupported attestation payload version: %r" % (pv,), "unverifiable")
+    fpv = receipt.get("fixedPointVersion")
+    if not _is_str(fpv) or not fpv:
+        raise PayloadError("%s requires receipt.fixedPointVersion" % pv, "contradicted")
+    members["payloadVersion"] = pv
+    members["fixedPointVersion"] = fpv
+    if pv == ATTESTATION_V3:
+        if not _is_str(sig.get("alg")) or not sig.get("alg"):
+            raise PayloadError("%s requires signature.alg" % ATTESTATION_V3, "contradicted")
+        members["alg"] = sig["alg"]
+    return members
+
+
+def receipt_payload(receipt):
+    """The exact string a receipt's issuer signed."""
+    return attestation_payload(receipt_payload_members(receipt))
+
+
+def verify_receipt(receipt, key_list=_UNSET, implemented=None, kept=None):
+    """Verify a whole receipt (spec §6.3 + §6.4). An unsigned receipt is unverifiable (L1 only)."""
+    if isinstance(receipt, dict) and receipt.get("signature") is None:
+        return Outcome("unverifiable", "receipt is unsigned: L1 only, no attestation to check")
+    try:
+        members = receipt_payload_members(receipt)
+    except PayloadError as e:
+        return Outcome(e.outcome, str(e))
+    return verify_attestation(members, receipt["signature"], key_list, implemented, kept)
+
+
+# ---- revocation lists (spec §7) --------------------------------------------------------------------
+REVOCATION_V02 = "GVP-Revocation/0.2"
+
+
+def revocation_list_payload(lst):
+    return canonicalize({k: v for k, v in lst.items() if k != "signature"})
+
+
+def _valid_revocation_entry(e):
+    """{responseHash} (kind absent or "responseHash") or {kind: "reportHash", reportHash}; any other kind,
+    None included, makes the list malformed (spec §7)."""
+    if not isinstance(e, dict):
+        return False
+    if "kind" not in e or e["kind"] == "responseHash":
+        return isinstance(e.get("responseHash"), str)
+    return e["kind"] == "reportHash" and isinstance(e.get("reportHash"), str)
+
+
+def verify_revocation_list(lst, key_list):
+    if lst is None:
+        return Outcome("unverifiable", "revocation list unreachable")
+    if not isinstance(lst, dict) or lst.get("revocationListVersion") != REVOCATION_V02 or not isinstance(lst.get("revoked"), list):
+        return Outcome("contradicted", "not a GVP-Revocation/0.2 document")
+    if not all(_valid_revocation_entry(e) for e in lst["revoked"]):
+        return Outcome("contradicted", "an entry has an unknown kind or no hash (spec §7)")
+    sig = lst.get("signature")
+    if not isinstance(sig, dict):
+        return Outcome("unverifiable", "revocation list is unsigned")
+    if not key_list:
+        return Outcome("unverifiable", "key list unreachable")
+    keys = key_list.get("keys", [])
+    entry = next((k for k in keys if (k.get("keyId") == sig.get("keyId") if sig.get("keyId") else k.get("publicKey") == sig.get("publicKey"))), None)
+    if entry is None:
+        return Outcome("contradicted", "revocation list key not in the key list")
+    if entry.get("alg") not in IMPLEMENTED_ALGS:
+        return Outcome("unverifiable", "key alg not implemented: %s" % entry.get("alg"))
+    if sig.get("publicKey") and sig["publicKey"] != entry["publicKey"]:
+        return Outcome("contradicted", "embedded publicKey differs from the listed key")
+    try:
+        key = _load_spki(entry["publicKey"])
+    except Exception:
+        return Outcome("contradicted", "listed publicKey is not SPKI DER")
+    if alg_of_key(key) != entry["alg"]:
+        return Outcome("contradicted", "listed key type does not match its pinned alg %s" % entry["alg"])
+    if _raw_verify(revocation_list_payload(lst), key, sig.get("signature")):
+        return Outcome("verified", "revocation list signed by %s" % entry.get("keyId"))
+    return Outcome("contradicted", "revocation list signature does not verify")
+
+
+def revocation_status(h, lst, key_list, kind="responseHash"):
+    """not-revoked | revoked | unverifiable (spec §7). A list that does not verify never reads as not-revoked."""
+    v = verify_revocation_list(lst, key_list)
+    if v[0] != "verified":
+        return "unverifiable"
+    for e in lst["revoked"]:
+        if (e["kind"] if "kind" in e else "responseHash") == kind and e.get(kind) == h:
+            return "revoked"
+    return "not-revoked"
+
+
 if __name__ == "__main__":
     vdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "vectors")
     # Run all three signed-payload shapes: /1 (legacy, attestation.json), /2 (attestation-v2.json) and
@@ -342,6 +461,37 @@ if __name__ == "__main__":
                 fails += 1
             print("%s %-62s -> %-12s %s" % ("ok  " if ok else "FAIL", c["name"], got[0],
                                              "" if ok else "(expected %s %s: %s %s)" % (c["expected"], c.get("discontinuity"), got[1], got.info)))
+
+    # Full receipts (spec §6.4) and revocation lists (spec §7)
+    fp = os.path.join(vdir, "receipt.json")
+    if os.path.exists(fp):
+        with open(fp, encoding="utf-8") as fh:
+            rv = json.load(fh)
+        print("== receipt.json")
+        for c in rv["cases"]:
+            total += 1
+            kl = {"published": rv["keyList"], "live": rv.get("liveKeyList"), "none": _UNSET}[c["keyList"]]
+            got = verify_receipt(c["receipt"], kl)
+            want = c["expected"]
+            if c.get("requires") and c["requires"] not in IMPLEMENTED_ALGS:
+                want = "unverifiable"
+            ok = got[0] == want
+            if "expectedPayload" in c:
+                try:
+                    ok = ok and receipt_payload(c["receipt"]) == c["expectedPayload"]
+                except PayloadError:
+                    ok = ok and c["expectedPayload"] is None
+            if not ok:
+                fails += 1
+            print("%s %-52s -> %-12s %s" % ("ok  " if ok else "FAIL", c["name"], got[0], "" if ok else "(expected %s: %s)" % (c["expected"], got[1])))
+        for c in rv["revocationCases"]:
+            total += 1
+            lst = None if c["list"] == "unreachable" else rv["revocationLists"][c["list"]]
+            got = revocation_status(c["hash"], lst, rv["keyList"], c.get("kind", "responseHash"))
+            ok = got == c["expected"]
+            if not ok:
+                fails += 1
+            print("%s %-52s -> %s" % ("ok  " if ok else "FAIL", c["name"], got))
 
     print("\n%d vectors, %d failures" % (total, fails))
     sys.exit(1 if fails else 0)

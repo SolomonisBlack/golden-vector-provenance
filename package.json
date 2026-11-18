@@ -1,6 +1,6 @@
 {
   "name": "golden-vector-provenance",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Reproducible provenance for computed answers: a canonical SHA-256 fixed point (RFC 8785 JCS) that anyone can re-derive for free, so you recompute the answer instead of trusting the server.",
   "keywords": [
     "provenance",
@@ -37,7 +37,8 @@
     "./vectors/attestation-v2": "./vectors/attestation-v2.json",
     "./vectors/attestation-v3": "./vectors/attestation-v3.json",
     "./vectors/attestation-outcomes": "./vectors/attestation-outcomes.json",
-    "./vectors/attestation-kept": "./vectors/attestation-kept.json"
+    "./vectors/attestation-kept": "./vectors/attestation-kept.json",
+    "./vectors/receipt": "./vectors/receipt.json"
   },
   "files": [
     "index.mjs",
@@ -63,7 +64,7 @@
     "!tools/**/package-lock.json"
   ],
   "scripts": {
-    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-attestation-v3.mjs && node tools/check-fixedpoint-2.mjs && node tools/check-hash-count.mjs && node tools/check-refusal-drift.mjs && node tools/check-refusal-roundtrip.mjs && node middleware/test.mjs && node examples/plain-http/test.mjs && node audit/test.mjs",
+    "test": "node tools/check-js.mjs && node tools/check-jcs.mjs && node tools/check-l2-binding.mjs && node tools/check-attestation-v3.mjs && node tools/check-receipt-payload.mjs && node tools/spec-only-verify.mjs && node tools/check-fixedpoint-2.mjs && node tools/check-hash-count.mjs && node tools/check-refusal-drift.mjs && node tools/check-refusal-roundtrip.mjs && node middleware/test.mjs && node examples/plain-http/test.mjs && node audit/test.mjs",
     "check:audit": "node audit/test.mjs",
     "check:hash-count": "node tools/check-hash-count.mjs",
     "check:refusal-drift": "node tools/check-refusal-drift.mjs",
@@ -80,7 +81,9 @@
     "check:plain-http": "node examples/plain-http/test.mjs",
     "check:l2v3": "node tools/check-attestation-v3.mjs",
     "attestation:v3": "node tools/gen-attestation-v3.mjs",
-    "attestation:kept": "node tools/gen-attestation-kept.mjs"
+    "attestation:kept": "node tools/gen-attestation-kept.mjs",
+    "check:receipt": "node tools/check-receipt-payload.mjs && node tools/spec-only-verify.mjs",
+    "vectors:receipt": "node tools/gen-receipt-vectors.mjs"
   },
   "devDependencies": {
     "canonicalize": "^2.1.0"

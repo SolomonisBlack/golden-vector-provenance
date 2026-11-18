@@ -43,6 +43,7 @@
   },
   {
     "name": "empty-containers-and-key-order",
+    "probe": "canonicalizer-only: zzz and aaa test key ordering and are NOT members of a valid fixed point (spec 2.1, closed five-member set). Use this vector to test canonicalization and hashing, never as an example of a conformant fixed point. Its pinned hash is unchanged.",
     "fixedPoint": { "endpoint": "/v1/empty", "zzz": 1, "aaa": 2, "inputs": { "obj": {}, "arr": [] }, "result": {}, "method": "m", "dataVintage": "2026.0" }
   },
   {
