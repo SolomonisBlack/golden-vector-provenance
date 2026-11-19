@@ -85,7 +85,7 @@ fields were hashed (`fixedPoint`) — but that list is the **spec constant**, no
 | That identity is bound to an on-chain handle | Optional | L3 anchor (e.g. ERC-8004) |
 | **The answer is *correct*** | **No** | a signature proves a server ran, not that it was right — an LLM can sign a confident hallucination. GVP makes the answer *re-derivable* so a consumer can decide for themselves |
 
-This distinction is the point of the standard, and it is deliberate. GVP is **not** a fact-checker,
+This distinction is the point of the specification, and it is deliberate. GVP is **not** a fact-checker,
 an oracle, an endorsement, or a certification.
 
 ## `GVP-FixedPoint/2` — `dataVintage` is now machine-comparable
@@ -171,13 +171,11 @@ Two companion notes locate GVP in the wider stack:
 - [`docs/RECOMPUTE-NOT-TRUST.md`](docs/RECOMPUTE-NOT-TRUST.md) — the five trust models for
   machine-produced answers (signatures, TEE, staking, zkML, recompute), what each proves, and the
   honest boundary of the recompute class GVP belongs to.
-- [`docs/REGULATORY-BRIDGE.md`](docs/REGULATORY-BRIDGE.md) — how GVP artifacts map to the evidence
-  classes named by the EU AI Act, ISO/IEC 42001, NIST AI RMF, and (reportedly) AI insurance
-  underwriting. Not legal advice, and it says so.
+- [`docs/REGULATORY-BRIDGE.md`](docs/REGULATORY-BRIDGE.md): which provisions of the EU AI
+  Act and NIST AI RMF each GVP artifact relates to. Not legal advice.
 - [`docs/COMPLIANCE-MEMO-ART50-ART12.md`](docs/COMPLIANCE-MEMO-ART50-ART12.md) — the one-page
-  version for audit and compliance vendors: what a receipt gives you under EU AI Act Article 50(2)
-  (complements synthetic-content marking; does not satisfy it alone) and Article 12 (the direct
-  fit: a re-derivable record instead of a log line), with the dates and the boundary stated.
+  version for audit and compliance vendors: how a receipt relates to Article 50(2) (it is not a
+  synthetic-content marking) and Article 12 (a recomputable record kept alongside logs).
 - [`docs/CARRIAGE-PROFILES.md`](docs/CARRIAGE-PROFILES.md) — where the hash travels: the x402
   extension envelope (C1), the original `provenance` block x402toll.com still emits (C2), and the
   `response_provenance` extension field for signed compliance-receipt profiles (C3). Same bytes
@@ -362,8 +360,8 @@ tools/check-attestation-v3.mjs  /3 check: vectors, outcomes (verified / unverifi
 tools/spec-only-verify.mjs      receipt verifier written from the spec alone; CLI: --receipt r.json --keys gvp-keys.json (outside this repo: npm i golden-vector-provenance canonicalize)
 tools/tenprint-mldsa65/       ML-DSA-65 cross-check: re-sign /3 with @noble/post-quantum 0.3.0, verify both ways (tools-only deps)
 docs/RECOMPUTE-NOT-TRUST.md   category note: the five trust models and where GVP sits
-docs/REGULATORY-BRIDGE.md     GVP artifacts mapped to EU AI Act / ISO 42001 / NIST AI RMF evidence classes
-docs/COMPLIANCE-MEMO-ART50-ART12.md  one-page memo for audit/compliance vendors: Art. 50(2) + Art. 12 fit and boundary
+docs/REGULATORY-BRIDGE.md     which EU AI Act / NIST AI RMF provisions each GVP artifact relates to (not legal advice)
+docs/COMPLIANCE-MEMO-ART50-ART12.md  one-page memo for audit/compliance vendors: how a receipt relates to Art. 50(2) and Art. 12
 docs/CARRIAGE-PROFILES.md     the three carriages (x402 envelope / provenance block / compliance-receipt field), same hash
 docs/MEASURED-NOT-CLAIMED.md  explainer: the x402 counter episode and what a re-derivable hash does and does not prove
 audit/cli.mjs                 gvp-audit: closure audit for sellers (bodies dir or free-surface fetch; never pays)

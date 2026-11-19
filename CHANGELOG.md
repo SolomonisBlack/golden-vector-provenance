@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+### Docs
+- **Regulatory documents corrected (2026-11-18), no version bump, no code or spec change.**
+  `docs/REGULATORY-BRIDGE.md` and `docs/COMPLIANCE-MEMO-ART50-ART12.md` said the high-risk logging
+  obligations of Regulation (EU) 2024/1689 applied from August 2026. That was wrong. Under Article 113
+  as amended by Regulation (EU) 2026/1744, Articles 12, 19 and 26 apply from 2 December 2027 (Annex
+  III systems) and 2 August 2028 (Annex I systems). Both files now carry a dated correction note.
+- The legal basis for the 2 December 2026 date for Article 50(2) is now cited as Article 111(4),
+  inserted by Regulation (EU) 2026/1744, not a provisional agreement.
+- Mapping wording narrowed in both files and in the README's two regulatory lines: the documents now
+  say which provisions a receipt relates to and that it is kept alongside logs. Removed: the
+  statements about what ISO/IEC 42001 requires and what insurers ask for (neither was confirmed), and
+  the statement that no comparable format exists for computed outputs (not sourced). The memo keeps
+  its file name and has a new title.
+- Each changed legal sentence was checked against the official texts: EUR-Lex for Regulation (EU) 2024/1689, Regulation (EU) 2026/1744 and Regulation (EU) 2016/679, and NIST AI 100-1 for the NIST framework. Not legal advice.
+- The 0.8.0-era entry below that describes the memo no longer repeats the withdrawn wording and
+  points to this entry.
+
 ## 0.13.0, 2026-11-18
 **Every receipt rebuildable from the receipt plus the spec; no hash change, no signed-bytes change.**
 Answers @giskard09 on x402-foundation/x402#2887, who verified a paid receipt end to end and had to
@@ -190,9 +208,9 @@ No normative change; no hash changes.
 - **`docs/MEASURED-NOT-CLAIMED.md`** (2026-09-15) — explainer: the x402.org counter episode
   (McGlynn 2026-09-06; Visa/Artemis July 2026 filtering 89% of dollar volume), the USENIX Security
   2026 x402 attack paper, and what a re-derivable hash does and does not prove. Dated sources inline.
-- **`docs/COMPLIANCE-MEMO-ART50-ART12.md`** — one page for audit/compliance vendors: EU AI Act
-  Art. 50(2) (complements synthetic-content marking, does not satisfy it alone; 2 Aug 2026 in force,
-  Omnibus window to 2 Dec 2026 for systems already on the market) and Art. 12 (the direct fit).
+- **`docs/COMPLIANCE-MEMO-ART50-ART12.md`**: one page for audit/compliance vendors on EU AI Act
+  Art. 50(2) and Art. 12. The mapping wording and the Article 12 date in the first version were
+  corrected on 2026-11-18; see "Unreleased" at the top of this file.
 
 ## 0.7.0 — 2026-08-26
 **Four normative rules, all from external conformance review, all backwards-compatible (`GVP-FixedPoint/1`

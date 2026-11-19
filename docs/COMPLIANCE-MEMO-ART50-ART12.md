@@ -1,10 +1,15 @@
-# Compliance memo: what a GVP receipt gives you under EU AI Act Article 50(2) and Article 12
+# What a GVP receipt is, and how it relates to Articles 50(2) and 12 of Regulation (EU) 2024/1689
 
-*For audit, compliance, and AI-governance vendors evaluating evidence sources. One page. Last verified
-2026-09-09. **This is not legal advice.** It states what a GVP artifact technically is and which
-obligation classes can consume it; whether it satisfies any obligation is a determination for counsel,
+*Corrected 2026-11-18: an earlier version said the high-risk logging obligations applied from August
+2026. Under Article 113 as amended by Regulation (EU) 2026/1744 they apply from 2 December 2027
+(Annex III systems) and 2 August 2028 (Annex I systems). Mapping wording was also narrowed after each
+legal sentence was checked against the official texts on EUR-Lex. Not legal advice.*
+
+*For audit, compliance, and AI-governance vendors evaluating provenance records. One page. Last revised
+2026-11-18. **This is not legal advice.** It states what a GVP artifact technically is and which
+provisions it relates to; whether it satisfies any obligation is a determination for counsel,
 an auditor, or a regulator. The companion document
-[`REGULATORY-BRIDGE.md`](REGULATORY-BRIDGE.md) covers ISO/IEC 42001, NIST AI RMF, and insurance.*
+[`REGULATORY-BRIDGE.md`](REGULATORY-BRIDGE.md) covers the same provisions and NIST AI RMF.*
 
 ## The artifact, in one line
 
@@ -15,36 +20,36 @@ binds issuer identity and time; the hash itself needs no key. Reference: `spec/g
 `golden-vector-provenance`, and the extension text under review at
 [x402-foundation/x402#3304](https://github.com/x402-foundation/x402/pull/3304).
 
-## Where the obligations stand (dates verified against the EU AI Act text and official guidance)
+## Where the obligations stand (dates read from EUR-Lex on 2026-11-18)
 
-| Obligation | What it asks | In force |
+| Obligation | What it asks | Applies from |
 |---|---|---|
-| **Art. 50(2)** — providers of systems generating synthetic audio, image, video, or text must mark outputs in a machine-readable format and make them detectable as AI-generated | machine-readable marking + detectability | 2 August 2026; the May 2026 AI Omnibus provisional agreement gives generative systems already on the market until **2 December 2026** to meet the marking requirement ([artificialintelligenceact.eu](https://artificialintelligenceact.eu/transparency-rules-article-50/)) |
-| **Art. 12** — high-risk systems must automatically record events over their lifetime; logs retained at least six months (Art. 19) | logging that supports traceability and post-market monitoring | high-risk obligations phased in from August 2026 ([Cooley, 2026-08-03](https://www.cooley.com/news/insight/2026/2026-08-03-eu-ai-act-transparency-obligations-take-effect-2-august-2026)) |
+| **Art. 50(2)**: providers of systems generating synthetic audio, image, video, or text must mark outputs in a machine-readable format and make them detectable as artificially generated or manipulated | machine-readable marking + detectability | 2 August 2026. Article 111(4), inserted by [Regulation (EU) 2026/1744](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng) (OJ L, 24.7.2026), gives providers of generative systems placed on the market before 2 August 2026 until **2 December 2026** to meet Article 50(2). |
+| **Art. 12**: Article 12(1) requires that systems classed as high-risk technically allow automatic recording of events over the system's lifetime. Articles 19(1) and 26(6) require providers and deployers to keep the automatically generated logs under their control for at least six months, unless other Union or national law provides otherwise. | logging that supports traceability and post-market monitoring | Under Article 113 as amended by Regulation (EU) 2026/1744, Articles 12, 19 and 26 apply from **2 December 2027** for Annex III systems and from **2 August 2028** for Annex I systems. |
 
 ## The mapping, stated at the size it deserves
 
-**Article 50(2).** The obligation targets *synthetic content*. C2PA is the accepted mechanism for
-media. **A GVP hash is not a synthetic-content watermark and does not satisfy Art. 50(2) on its
-own.** What it does: for the class of AI-system outputs that are *computed answers* (a tax figure, a
-rate, a score, a classification with a stated method), it supplies the machine-readable, standardized,
-cryptographic provenance member that a marking pipeline can carry in the same envelope as the
-disclosure. No comparable standard exists for computed outputs today; C2PA does not cover them. That
-is the gap this artifact fills, and the boundary is the whole claim.
+**Article 50(2).** The obligation targets *synthetic content*. The Regulation names no specific
+standard. **A GVP hash is not a marking of synthetic content under Article 50(2).** What it does:
+for computed answers (a tax figure, a rate, a score with a stated method), whether or not the
+producing software falls within the Regulation, it supplies a machine-readable provenance record.
+The boundary is the whole claim.
 
-**Article 12.** This is the direct fit. A log line asserts that an event happened; a GVP receipt lets a
-later party *re-derive* it. For each covered computation the record binds the question (`endpoint`,
+**Article 12.** Article 12 is the provision these records most closely relate to. It concerns event
+logging by systems classed as high-risk. A GVP receipt is a different kind of record from a log line: a
+later party can *recompute* the answer it covers. For each covered computation the record binds the question (`endpoint`,
 `inputs`), the method, the data currency (`dataVintage`, which must characterise every contributing
 source and must be the oldest where they differ), and the result, in one hash checkable after the
-producing system is gone. Retention cost is the hash plus its members. The closure rule (spec §2.1.2)
+producing system is gone. A receipt is small to store. If its inputs include personal data, data
+protection law governs what may be kept and for how long. The closure rule (spec §2.1.2)
 forbids emitting a hash where the result depends on anything outside the fixed point, so the record
-documents its own scope of control by silence rather than by a softer claim.
+states the scope of what it covers: an answer it cannot re-derive carries no hash rather than a softer claim.
 
-## What an auditor receives, and what remains theirs to do
+## What a reviewer receives, and what remains theirs to do
 
 | You get | You still do |
 |---|---|
-| per-answer re-derivable records, offline | decide which computations are in scope for Art. 12 |
+| per-answer re-derivable records, offline | decide, with counsel, whether the system is classed as high-risk under Article 6 and which events its logs must record |
 | published golden vectors: the method's own correctness test | verify the vectors against the authoritative source (the spec requires this of any verifier, §8.1) |
 | a four-state verdict vocabulary (`verified`, `no_claim`, `unverifiable`, `contradicted`) that cannot be collapsed into pass/fail | map verdicts into your control framework |
 | L2 issuer attestation (Ed25519) and an optional on-chain anchor for existence-before-a-time | key management and anchor policy |
@@ -54,7 +59,7 @@ documents its own scope of control by silence rather than by a softer claim.
 
 > Computed outputs carrying GVP provenance are individually re-derivable by any party with a standard
 > RFC 8785 library: the record of what was computed, from what inputs, by what method, on data of what
-> vintage, is cryptographic, machine-readable, retained at negligible cost, and independent of trust in
+> vintage, is cryptographic, machine-readable, small to store, and independent of trust in
 > the system or its operator. It complements, and does not replace, synthetic-content marking.
 
 Corrections: open an issue. Over-claiming is a defect here in the same way a wrong hash is.
